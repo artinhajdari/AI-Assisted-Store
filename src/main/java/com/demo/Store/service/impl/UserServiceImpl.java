@@ -37,6 +37,9 @@ public class UserServiceImpl implements UserDetailsService, UserService {
     @Transactional
     @Override
     public OperationResultDto registerNewUser(RegistrationInfoDto registrationInfo) {
+        if (userRepository.existsByUsername(registrationInfo.getUsername())) {
+            return new OperationResultDto.Builder().valid(false).message(messageSourceService.getMessage("store.auth.UsernameAlreadyInUse")).build();
+        }
         User user = new User.Builder().setName(registrationInfo.getName()).setSurname(registrationInfo.getSurname()).setUsername(registrationInfo.getUsername()).setPassword(passwordEncoder.encode(registrationInfo.getPassword())).locked(Boolean.FALSE).setRole(UserRole.USER).createUser();
         userRepository.save(user);
         return new OperationResultDto.Builder().valid(true).message(messageSourceService.getMessage("store.auth.RegistrationSuccessful")).build();

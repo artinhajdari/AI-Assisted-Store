@@ -23,6 +23,13 @@ public interface UserRepository extends JpaRepository<User, Long> {
     @Modifying
     @Query("UPDATE User u SET u.locked = CASE WHEN u.locked = true THEN false ELSE true END WHERE u.id = :userId")
     void toggleUserAccountLock(Long userId);
+
+    @Query("""
+    select (count(u) > 0)
+    from User u
+    where u.username = :username
+    """)
+    Boolean existsByUsername(String username);
 }
 
 
