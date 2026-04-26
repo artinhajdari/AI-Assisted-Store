@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="en">
+<head>
+    <title th:text="#{store.auth.Login}"></title>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <th:block th:replace="~{fragments/common-scripts-styles :: common-scripts-styles}"></th:block>
+    <script type="module" th:src="@{/js/validation/auth-validation.js}"></script>
+    <script>
+        const validationData = {
+            validEmailAddress: '[[#{store.validation.ValidEmailAddress}]]',
+            fieldRequired: '[[#{store.validation.FieldRequired}]]',
+        }
+    </script>
+</head>
+<body class="bg-light d-flex align-items-center justify-content-center min-vh-100 py-5">
+<div class="container" style="max-width: 400px;">
+    <div class="text-center mb-4">
+        <h2 th:text="#{store.auth.WelcomeBack}" class="fw-bold"></h2>
+    </div>
+
+    <div class="card shadow-sm border-0 p-4">
+        <th:block th:replace="~{fragments/notification :: notification}"></th:block>
+        <form th:action="@{/login}" class="validated-form" method="post">
+            <div class="mb-3 form-group">
+                <label th:text="#{store.auth.Username}" for="username" class="form-label text-muted small"></label>
+                <input type="text" id="username" name="username" class="form-control required" autofocus>
+                <div class="invalid-feedback error-field"></div>
+            </div>
+            <div class="mb-4 form-group">
+                <label th:text="#{store.auth.Password}" for="password" class="form-label text-muted small"></label>
+                <input type="password" id="password" name="password" class="form-control required" autofocus>
+                <div class="invalid-feedback error-field"></div>
+            </div>
+            <button th:text="#{store.auth.SignIn}" type="submit" class="btn btn-primary w-100 py-2"></button>
+        </form>
+        <div class="text-center mt-3 small">
+            <span th:text="#{store.auth.DontHaveAnAccount}" class="text-muted"></span> <a th:text="#{store.auth.RegisterHere}" th:href="@{/register}" class="text-decoration-none"></a>
+        </div>
+    </div>
+    <div class="text-center mt-3">
+        <a th:text="'&larr;' + #{store.nav.ReturnToStore}" th:href="@{/}" class="text-muted text-decoration-none small"> </a>
+    </div>
+</div>
+</body>
+</html>

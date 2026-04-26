@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="en">
+<head>
+  <title th:text="#{admin.users.ManageUsers}"></title>
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <th:block th:replace="~{fragments/common-scripts-styles :: common-scripts-styles}"></th:block>
+</head>
+<body class="bg-light">
+
+<div class="container py-5">
+  <div class="d-flex justify-content-between align-items-center mb-4">
+    <h2 th:text="#{admin.users.UserManagement}" class="fw-bold mb-0"></h2>
+    <div>
+      <th:block th:replace="~{fragments/nav-links :: nav-links}"></th:block>
+    </div>
+  </div>
+  <th:block th:replace="~{fragments/notification :: notification}"></th:block>
+  <div class="card shadow-sm border-0">
+    <div class="table-responsive">
+      <table class="table table-hover align-middle mb-0">
+        <thead class="table-light">
+        <tr>
+          <th th:text="#{admin.users.Name}"></th>
+          <th th:text="#{admin.users.Surname}"></th>
+          <th th:text="#{admin.users.Username}"></th>
+          <th th:text="#{admin.users.Status}"></th>
+          <th th:text="#{admin.users.LastLoggedIn}"></th>
+          <th th:text="#{admin.users.Actions}"></th>
+        </tr>
+        </thead>
+        <tbody>
+        <tr th:each="user : ${users}">
+          <td th:text="${user.name}" class="fw-semibold"></td>
+          <td th:text="${user.surname}" class="fw-semibold"></td>
+          <td th:text="${user.username}" class="fw-semibold"></td>
+          <td>
+                            <span class="badge"
+                                  th:classappend="${user.locked  ? 'bg-danger' : 'bg-success'}"
+                                  th:text="${user.locked} ? #{admin.users.Locked} : #{admin.users.Active}">
+                            </span>
+          </td>
+          <td th:text="${user.lastLogin}"></td>
+          <td>
+            <div class="d-flex gap-2">
+              <form th:action="@{/admin/users/toggle-lock}" method="post" class="m-0">
+                <input type="hidden" name="userId" th:value="${user.id}" />
+                <button type="submit" class="btn btn-sm" th:classappend="${user.locked ? 'btn-success' : 'btn-warning'}" th:text="${user.locked} ? #{admin.users.Unlock} : #{admin.users.Lock}"></button>
+              </form>
+            </div>
+          </td>
+        </tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+</div>
+</body>
+</html>

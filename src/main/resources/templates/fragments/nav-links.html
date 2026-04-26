@@ -1,0 +1,13 @@
+<html xmlns:th="http://www.thymeleaf.org" xmlns:sec="http://www.w3.org/1999/xhtml">
+<body>
+<div th:fragment="nav-links">
+    <a th:text="#{admin.products.AddProduct}" th:href="@{/admin/products/new}"
+       th:if="${currentUri.startsWith('/admin/products/list')}" class="btn btn-primary btn-sm me-2"></a>
+    <a th:text="#{admin.users.ManageUsers}" th:href="@{/admin/users/list}"
+       th:if="${currentUri.startsWith('/admin/products/list')}" class="btn btn-outline-secondary btn-sm me-2"></a>
+    <a th:text="#{store.nav.BackToStore}" th:href="@{/}" class="btn btn-outline-dark btn-sm"></a>
+    <a th:text="#{admin.products.BackToProducts}" th:href="@{/admin/products/list}"
+       th:if="${currentUri == '/admin/products/new' || currentUri == '/admin/products/edit' || currentUri == '/admin/users/list'}" class="btn btn-outline-secondary btn-sm me-2"></a>
+</div>
+</body>
+</html>

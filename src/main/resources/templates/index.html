@@ -1,0 +1,92 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" xmlns:sec="http://www.thymeleaf.org/extras/spring-security" lang="en">
+<head>
+    <title th:text="#{store.AIAssistedStore}"></title>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <th:block th:replace="~{fragments/common-scripts-styles :: common-scripts-styles}"></th:block>
+    <script type="module" th:src="@{/js/store.js}"></script>
+    <script>
+        const storeData = {
+            currency: '[[#{store.Currency}]]'
+        }
+    </script>
+</head>
+<body class="bg-light">
+<nav class="navbar navbar-expand-lg navbar-light bg-white shadow-sm mb-5">
+    <div class="container">
+        <a th:text="#{store.DemoAI}" class="navbar-brand fw-bold" th:href="@{/}"><span th:text="#{store.Store}" class="text-primary"></span></a>
+
+        <div class="d-flex align-items-center gap-3">
+            <span sec:authorize="hasAuthority('ADMIN')">
+                <a th:text="#{admin.AdminDashboard}" th:href="@{/admin/products/list}" class="text-decoration-none text-muted small"></a>
+            </span>
+
+            <div sec:authorize="!isAuthenticated()">
+                <a th:text="#{store.auth.Login}" th:href="@{/login}" class="btn btn-outline-primary btn-sm"></a>
+                <a th:text="#{store.auth.Register}" th:href="@{/register}" class="btn btn-primary btn-sm"></a>
+            </div>
+
+            <div sec:authorize="isAuthenticated()" class="d-flex align-items-center gap-2">
+                <span class="text-muted small" th:text="'Hi, ' + ${#authentication.name}"></span>
+                <form th:action="@{/logout}" method="post" class="m-0">
+                    <button th:text="#{store.auth.Logout}" type="submit" class="btn btn-sm btn-danger"></button>
+                </form>
+            </div>
+        </div>
+    </div>
+</nav>
+
+<div id="searchContainer" class="container text-center mb-5" th:data-search-products-url="@{/search}">
+    <div class="notifications">
+        <div id="alertWrapper"></div>
+    </div>
+    <h2 th:text="#{store.WhatAreYouLookingForToday}" class="fw-light mb-3"></h2>
+    <div class="row justify-content-center">
+        <div class="col-md-8">
+                <div class="input-group input-group-lg shadow-sm">
+                    <input type="text" id="query" name="query" class="form-control" th:placeholder="#{store.QueryPlaceholder}" th:value="${query}">
+                    <button th:text="#{store.Search}" id="searchButton" class="btn btn-primary" type="submit"></button>
+                </div>
+            <p th:text="#{store.SearchResults}" class="d-none text-muted small mt-2"></p>
+        </div>
+    </div>
+</div>
+
+<div class="container mb-5">
+    <div id="noProductsFound" class="d-none text-center text-muted py-5">
+        <p th:text="#{store.NoProductsFound}"></p>
+    </div>
+    <div id="productContainer" class="position-relative row row-cols-1 row-cols-sm-2 row-cols-md-3 row-cols-lg-4 g-4">
+        <div class="d-none position-absolute top-0 start-0 w-100 h-100 d-flex justify-content-center align-items-center bg-white bg-opacity-50 z-3 loading-spinner">
+            <div class="spinner-border text-primary" role="status">
+            </div>
+        </div>
+    </div>
+    <div id="loadMoreWrapper" class="d-none d-flex justify-content-center mt-5 mb-4">
+        <button id="loadMoreProducts" class="btn btn-outline-dark rounded-pill px-5 py-2 shadow-sm fw-bold">
+            <span th:text="#{store.LoadMoreProducts}" id="load-text"></span>
+            <div class="spinner-border spinner-border-sm d-none loading-spinner" role="status">
+                <span th:text="#{store.Loading}" class="visually-hidden"></span>
+            </div>
+        </button>
+    </div>
+</div>
+<!-- Modals -->
+<div class="modal fade" tabindex="-1" id="descriptionModal">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title"></h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+            </div>
+            <div class="modal-footer">
+                <button th:text="#{store.modal.Close}" type="button" class="btn btn-secondary" data-bs-dismiss="modal"></button>
+            </div>
+        </div>
+    </div>
+</div>
+<!-- End of modals-->
+</body>
+</html>

@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="en">
+<head>
+    <title th:text="#{admin.products.ManageProducts}"></title>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <th:block th:replace="~{fragments/common-scripts-styles :: common-scripts-styles}"></th:block>
+</head>
+<body class="bg-light">
+
+<div class="container py-5">
+    <div class="d-flex flex-wrap justify-content-between align-items-center mb-4 gap-3">
+        <h2 class="fw-bold mb-0">Product Inventory</h2>
+        <th:block th:replace="~{fragments/nav-links :: nav-links}"></th:block>
+    </div>
+    <th:block th:replace="~{fragments/notification :: notification}"></th:block>
+    <div class="card shadow-sm border-0">
+        <div class="table-responsive">
+            <table class="table table-hover align-middle mb-0">
+                <thead class="table-light">
+                <tr>
+                    <th th:text="#{admin.products.Name}"></th>
+                    <th th:text="#{admin.products.Price}"></th>
+                    <th th:text="#{admin.products.Actions}"></th>
+                </tr>
+                </thead>
+                <tbody>
+                <tr th:each="product : ${products}">
+                    <td th:text="${product.name}" class="fw-semibold"></td>
+                    <td th:text="${'$' + product.price}"></td>
+                    <td>
+                        <div class="d-flex gap-2">
+                            <a th:text="#{admin.products.Edit}" th:href="@{/admin/products/edit(id=${product.id})}" class="btn btn-outline-secondary btn-sm"></a>
+                            <form th:action="@{/admin/products/delete}" method="post" class="m-0">
+                                <input type="hidden" name="id" th:value="${product.id}" />
+                                <button th:text="#{admin.products.Delete}" type="submit" class="btn btn-danger btn-sm"></button>
+                            </form>
+                        </div>
+                    </td>
+                </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+</body>
+</html>

@@ -1,0 +1,85 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="en">
+<head>
+    <title th:text="${product.id == null} ? #{admin.products.AddProductAdmin} : #{admin.products.EditProductAdmin}"></title>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <th:block th:replace="~{fragments/common-scripts-styles :: common-scripts-styles}"></th:block>
+    <script type="module" th:src="@{/js/validation/product-validation.js}"></script>
+    <script th:src="@{/js/product-management.js}"></script>
+    <script>
+        const validationData = {
+            fieldRequired: '[[#{store.validation.FieldRequired}]]',
+            minPrice: '[[${validation.minPrice}]]',
+            maxPrice: '[[${validation.maxPrice}]]',
+            minQuantity: '[[${validation.minQuantity}]]',
+            maxQuantity: '[[${validation.maxQuantity}]]',
+            integerQuantity: '[[#{store.validation.IntegerField}]]',
+            detailedDescMinLength:  '[[${validation.detailedDescMinLength}]]',
+            simpleDescMinLength:  '[[${validation.simpleDescMinLength}]]',
+            minPriceMessage: '[[${validation.minPriceMessage}]]',
+            maxPriceMessage: '[[${validation.maxPriceMessage}]]',
+            minQuantityMessage: '[[${validation.minQuantityMessage}]]',
+            maxQuantityMessage: '[[${validation.maxQuantityMessage}]]',
+            detailedDescMinLengthMessage:  '[[${validation.detailedDescMinLengthMessage}]]',
+            simpleDescMinLengthMessage:  '[[${validation.simpleDescMinLengthMessage}]]'
+        }
+    </script>
+</head>
+<body class="bg-light py-5">
+
+<div class="container" style="max-width: 700px;">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h2 class="fw-bold mb-0">Product Details</h2>
+        <div>
+            <th:block th:replace="~{fragments/nav-links :: nav-links}"></th:block>
+        </div>
+    </div>
+
+    <div class="card shadow-sm border-0 p-4">
+        <form id="productForm" th:action="${product.id == null} ? @{/admin/products/new} : @{/admin/products/edit}" th:object="${product}" method="post">
+            <input type="hidden" th:field="*{id}">
+            <div class="mb-3">
+                <label th:text="#{admin.products.ProductName}" for="name" class="form-label text-muted small fw-bold"></label>
+                <input type="text" id="name" th:field="*{name}" class="form-control form-control-lg" required
+                       th:placeholder="#{admin.products.ProductNamePlaceholder}">
+            </div>
+
+            <div class="mb-4">
+                <label th:text="#{admin.products.PriceCurrency}" for="price"
+                       class="form-label text-muted small fw-bold"></label>
+                <input type="number" id="price" th:field="*{price}" step="0.01" class="form-control form-control-lg"
+                       required
+                       th:placeholder="#{admin.products.PricePlaceholder}">
+            </div>
+
+            <div class="mb-4">
+                <label th:text="#{admin.products.Quantity}" for="price"
+                       class="form-label text-muted small fw-bold"></label>
+                <input type="number" id="quantity" th:field="*{quantity}" min="0" step="1"
+                       class="form-control form-control-lg" required
+                       th:placeholder="#{admin.products.QuantityPlaceholder}">
+            </div>
+            <div class="alert alert-info py-2 small mb-4">
+                <strong th:text="#{admin.products.AISearchNote} + ': '"></strong><span th:text="#{admin.products.AISearchNoteText}"></span>
+            </div>
+            <div class="mb-4">
+                <label th:text="#{admin.products.DetailedDescription}"  for="aiDescription" class="form-label text-muted small fw-bold"></label>
+                <textarea id="aiDescription" th:field="*{aiDescription}" class="form-control" rows="5" required
+                          th:placeholder="#{admin.products.DetailedDescriptionPlaceholder}" maxlength="1000"></textarea>
+            </div>
+            <div id="displayedDescriptionWrapper" class="mb-4 clearfix">
+                <label th:text="#{admin.products.DisplayedDescription}" for="displayedDescription" class="form-label text-muted small fw-bold"></label>
+                <textarea id="displayedDescription" th:field="*{displayedDescription}" class="form-control" rows="3" required
+                          th:placeholder="#{admin.products.DisplayedDescriptionPlaceholder}" maxlength="200"></textarea>
+                <div class="form-text float-end">
+                    <span th:text="#{admin.products.DisplayedDescriptionMaxCharCount}" id="charCount"></span> <span th:text="#{admin.products.DisplayedDescriptionRemainingChars}"></span>
+                </div>
+            </div>
+            <div class="d-grid mt-2">
+                <button th:text="#{admin.products.SaveProduct}" type="submit" class="btn btn-primary btn-lg"></button>
+            </div>
+        </form>
+    </div>
+</div>
+</body>
+</html>

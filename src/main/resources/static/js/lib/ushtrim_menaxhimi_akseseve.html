@@ -1,0 +1,1710 @@
+<html lang="sq"><head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Ushtrim - Menaxhimi i Akseseve dhe të Drejtave në Sisteme</title>
+<style>
+  :root {
+    --blue: #1a56db;
+    --blue-light: #e8f0fe;
+    --green: #057a55;
+    --green-light: #def7ec;
+    --red: #c81e1e;
+    --red-light: #fde8e8;
+    --orange: #d97706;
+    --orange-light: #fef3c7;
+    --purple: #6c2bd9;
+    --purple-light: #ede9fe;
+    --gray: #374151;
+    --gray-light: #f3f4f6;
+    --border: #d1d5db;
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    font-family: 'Segoe UI', Arial, sans-serif;
+    background: linear-gradient(135deg, #1e3a8a 0%, #1a56db 100%);
+    min-height: 100vh;
+    padding: 20px;
+  }
+
+  .container {
+    max-width: 900px;
+    margin: 0 auto;
+  }
+
+  /* HEADER */
+  .header {
+    background: white;
+    border-radius: 16px;
+    padding: 30px;
+    margin-bottom: 20px;
+    box-shadow: 0 4px 24px rgba(0,0,0,0.15);
+    text-align: center;
+  }
+
+  .header h1 {
+    font-size: 1.6rem;
+    color: var(--blue);
+    margin-bottom: 6px;
+  }
+
+  .header p { color: #6b7280; font-size: 0.9rem; }
+
+  .student-info {
+    display: grid;
+    grid-template-columns: 1fr 1fr 1fr;
+    gap: 12px;
+    margin-top: 20px;
+  }
+
+  .student-info input {
+    padding: 10px 14px;
+    border: 2px solid var(--border);
+    border-radius: 8px;
+    font-size: 0.95rem;
+    transition: border-color .2s;
+    width: 100%;
+  }
+
+  .student-info input:focus { outline: none; border-color: var(--blue); }
+
+  /* PROGRESS PANEL */
+  .progress-panel {
+    background: white;
+    border-radius: 16px;
+    padding: 18px 22px;
+    margin-bottom: 20px;
+    box-shadow: 0 2px 14px rgba(0,0,0,0.12);
+    position: sticky;
+    top: 12px;
+    z-index: 100;
+  }
+
+  .progress-top {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    margin-bottom: 12px;
+  }
+
+  .progress-bar-bg {
+    flex: 1;
+    background: #e5e7eb;
+    border-radius: 99px;
+    height: 13px;
+    overflow: hidden;
+  }
+
+  .progress-bar-fill {
+    height: 100%;
+    background: linear-gradient(90deg, var(--blue), #7c3aed);
+    border-radius: 99px;
+    transition: width .5s ease;
+    width: 0%;
+  }
+
+  .progress-label { font-weight: 700; color: var(--blue); font-size: 0.9rem; white-space: nowrap; }
+
+  .stats-row {
+    display: flex;
+    gap: 10px;
+    flex-wrap: wrap;
+  }
+
+  .stat-chip {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    padding: 5px 13px;
+    border-radius: 99px;
+    font-size: 0.82rem;
+    font-weight: 700;
+    border: 1.5px solid;
+  }
+
+  .stat-chip.done { background: var(--blue-light); border-color: #93c5fd; color: var(--blue); }
+  .stat-chip.correct { background: var(--green-light); border-color: #6ee7b7; color: var(--green); }
+  .stat-chip.wrong { background: var(--red-light); border-color: #fca5a5; color: var(--red); }
+  .stat-chip.open-chip { background: var(--purple-light); border-color: #c4b5fd; color: var(--purple); }
+  .stat-chip.pct { background: #fef3c7; border-color: #fcd34d; color: #92400e; }
+
+  .q-status-grid {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 5px;
+    margin-top: 10px;
+  }
+
+  .q-dot {
+    width: 28px; height: 28px;
+    border-radius: 50%;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 0.7rem;
+    font-weight: 700;
+    border: 2px solid var(--border);
+    background: var(--gray-light);
+    color: #9ca3af;
+    cursor: default;
+    transition: all .3s;
+  }
+  .q-dot.answered { background: var(--blue-light); border-color: var(--blue); color: var(--blue); }
+  .q-dot.correct-dot { background: var(--green-light); border-color: var(--green); color: var(--green); }
+  .q-dot.wrong-dot { background: var(--red-light); border-color: var(--red); color: var(--red); }
+  .q-dot.open-dot { background: var(--purple-light); border-color: var(--purple); color: var(--purple); }
+
+  /* QUESTION CARD */
+  .q-card {
+    background: white;
+    border-radius: 16px;
+    padding: 28px;
+    margin-bottom: 20px;
+    box-shadow: 0 2px 16px rgba(0,0,0,0.08);
+    border-left: 5px solid var(--blue);
+    transition: box-shadow .2s;
+  }
+
+  .q-card:hover { box-shadow: 0 4px 24px rgba(0,0,0,0.13); }
+
+  .q-meta {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin-bottom: 14px;
+  }
+
+  .q-num {
+    background: var(--blue);
+    color: white;
+    border-radius: 50%;
+    width: 32px; height: 32px;
+    display: flex; align-items: center; justify-content: center;
+    font-weight: 700; font-size: 0.85rem;
+    flex-shrink: 0;
+  }
+
+  .q-type-badge {
+    font-size: 0.72rem;
+    font-weight: 700;
+    padding: 3px 10px;
+    border-radius: 99px;
+    letter-spacing: .5px;
+    text-transform: uppercase;
+  }
+
+  .badge-mc { background: var(--blue-light); color: var(--blue); }
+  .badge-tf { background: var(--orange-light); color: var(--orange); }
+  .badge-open { background: var(--purple-light); color: var(--purple); }
+  .badge-dd { background: var(--green-light); color: var(--green); }
+  .badge-fill { background: #fce7f3; color: #be185d; }
+  .badge-match { background: #e0f2fe; color: #0369a1; }
+  .badge-draw { background: #fef9c3; color: #92400e; }
+  .badge-order { background: #f3e8ff; color: var(--purple); }
+
+  .q-text {
+    font-size: 1rem;
+    color: var(--gray);
+    font-weight: 600;
+    margin-bottom: 16px;
+    line-height: 1.5;
+  }
+
+  /* HINT */
+  .hint-btn {
+    background: none;
+    border: 1.5px dashed var(--orange);
+    color: var(--orange);
+    border-radius: 8px;
+    padding: 5px 14px;
+    font-size: 0.8rem;
+    cursor: pointer;
+    margin-bottom: 12px;
+    transition: background .2s;
+  }
+  .hint-btn:hover { background: var(--orange-light); }
+  .hint-box {
+    background: var(--orange-light);
+    border: 1px solid #fcd34d;
+    border-radius: 8px;
+    padding: 10px 14px;
+    font-size: 0.85rem;
+    color: #92400e;
+    margin-bottom: 12px;
+    display: none;
+  }
+
+  /* MC OPTIONS */
+  .options { display: flex; flex-direction: column; gap: 10px; }
+
+  .option {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 12px 16px;
+    border: 2px solid var(--border);
+    border-radius: 10px;
+    cursor: pointer;
+    transition: all .2s;
+    user-select: none;
+  }
+
+  .option:hover { border-color: var(--blue); background: var(--blue-light); }
+  .option input { width: 18px; height: 18px; accent-color: var(--blue); }
+  .option span { font-size: 0.95rem; color: var(--gray); }
+
+  .option.correct { border-color: var(--green); background: var(--green-light); }
+  .option.wrong { border-color: var(--red); background: var(--red-light); }
+
+  /* OPEN TEXT */
+  textarea {
+    width: 100%;
+    border: 2px solid var(--border);
+    border-radius: 10px;
+    padding: 12px;
+    font-size: 0.95rem;
+    resize: vertical;
+    min-height: 90px;
+    font-family: inherit;
+    transition: border-color .2s;
+  }
+  textarea:focus { outline: none; border-color: var(--blue); }
+
+  /* FILL IN BLANK */
+  .fill-wrap { display: flex; flex-wrap: wrap; align-items: center; gap: 6px; line-height: 2.2; font-size: 0.95rem; color: var(--gray); }
+  .blank-input {
+    border: none;
+    border-bottom: 2.5px solid var(--blue);
+    background: transparent;
+    padding: 2px 6px;
+    font-size: 0.95rem;
+    color: var(--gray);
+    width: 130px;
+    text-align: center;
+    outline: none;
+    transition: border-color .2s;
+  }
+  .blank-input:focus { border-color: var(--purple); }
+
+  /* DRAG & DROP */
+  .dd-area { display: flex; flex-direction: column; gap: 18px; }
+
+  .dd-row {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    flex-wrap: wrap;
+  }
+
+  .dd-label {
+    min-width: 160px;
+    padding: 10px 14px;
+    background: var(--blue-light);
+    border: 2px solid #93c5fd;
+    border-radius: 10px;
+    font-weight: 600;
+    font-size: 0.9rem;
+    color: var(--blue);
+  }
+
+  .dd-arrow { font-size: 1.2rem; color: #9ca3af; }
+
+  .dd-drop {
+    flex: 1;
+    min-height: 46px;
+    border: 2.5px dashed var(--border);
+    border-radius: 10px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: var(--gray-light);
+    transition: all .2s;
+    font-size: 0.9rem;
+    color: #9ca3af;
+    cursor: default;
+    padding: 6px 10px;
+    flex-wrap: wrap;
+    gap: 6px;
+  }
+
+  .dd-drop.over { border-color: var(--blue); background: var(--blue-light); }
+  .dd-drop.correct-drop { border-color: var(--green); background: var(--green-light); }
+  .dd-drop.wrong-drop { border-color: var(--red); background: var(--red-light); }
+
+  .dd-chips { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 10px; }
+
+  .chip {
+    background: white;
+    border: 2px solid var(--border);
+    border-radius: 20px;
+    padding: 6px 14px;
+    cursor: grab;
+    font-size: 0.88rem;
+    color: var(--gray);
+    user-select: none;
+    transition: all .2s;
+    box-shadow: 0 1px 4px rgba(0,0,0,0.08);
+  }
+  .chip:hover { border-color: var(--blue); color: var(--blue); box-shadow: 0 2px 8px rgba(26,86,219,0.15); }
+  .chip.dragging { opacity: 0.4; }
+  .chip.placed { opacity: 0.6; cursor: default; }
+
+  /* MATCHING */
+  .match-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+  .match-left { display: flex; flex-direction: column; gap: 8px; }
+  .match-right { display: flex; flex-direction: column; gap: 8px; }
+  .match-item {
+    padding: 10px 14px;
+    border: 2px solid var(--border);
+    border-radius: 8px;
+    font-size: 0.88rem;
+    color: var(--gray);
+  }
+  .match-left .match-item { background: var(--blue-light); border-color: #93c5fd; font-weight: 600; }
+
+  select {
+    width: 100%;
+    padding: 8px 12px;
+    border: 2px solid var(--border);
+    border-radius: 8px;
+    font-size: 0.9rem;
+    color: var(--gray);
+    background: white;
+    cursor: pointer;
+    transition: border-color .2s;
+    font-family: inherit;
+  }
+  select:focus { outline: none; border-color: var(--blue); }
+
+  /* ORDERING */
+  .order-list { display: flex; flex-direction: column; gap: 8px; }
+  .order-item {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 12px 14px;
+    background: var(--gray-light);
+    border: 2px solid var(--border);
+    border-radius: 10px;
+    cursor: grab;
+    user-select: none;
+    transition: all .2s;
+  }
+  .order-item:hover { border-color: var(--blue); }
+  .order-item.dragging-order { opacity: 0.4; }
+  .order-handle { color: #9ca3af; font-size: 1.1rem; }
+  .order-num {
+    background: var(--blue);
+    color: white;
+    border-radius: 50%;
+    width: 26px; height: 26px;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 0.8rem;
+    font-weight: 700;
+    flex-shrink: 0;
+  }
+
+  /* DRAWING CANVAS */
+  .canvas-wrap {
+    border: 2px solid var(--border);
+    border-radius: 10px;
+    overflow: hidden;
+    position: relative;
+    background: white;
+  }
+  canvas {
+    display: block;
+    cursor: crosshair;
+    touch-action: none;
+  }
+  .canvas-tools {
+    display: flex;
+    gap: 8px;
+    align-items: center;
+    padding: 8px 12px;
+    background: var(--gray-light);
+    border-top: 1px solid var(--border);
+    flex-wrap: wrap;
+  }
+  .canvas-tools button {
+    padding: 5px 12px;
+    border: 1.5px solid var(--border);
+    border-radius: 6px;
+    cursor: pointer;
+    font-size: 0.8rem;
+    background: white;
+    transition: all .2s;
+  }
+  .canvas-tools button:hover { border-color: var(--blue); color: var(--blue); }
+  .color-pick { display: flex; gap: 6px; align-items: center; }
+  .color-dot {
+    width: 22px; height: 22px;
+    border-radius: 50%;
+    cursor: pointer;
+    border: 2px solid transparent;
+    transition: transform .15s;
+  }
+  .color-dot:hover, .color-dot.active { transform: scale(1.2); border-color: #374151; }
+
+  /* FEEDBACK */
+  .feedback {
+    display: none;
+    margin-top: 12px;
+    padding: 10px 16px;
+    border-radius: 10px;
+    font-size: 0.9rem;
+    font-weight: 600;
+  }
+  .feedback.correct { background: var(--green-light); color: var(--green); border: 1px solid #6ee7b7; }
+  .feedback.wrong { background: var(--red-light); color: var(--red); border: 1px solid #fca5a5; }
+  .feedback.neutral { background: var(--purple-light); color: var(--purple); border: 1px solid #c4b5fd; }
+
+  /* CHECK BUTTON */
+  .check-btn {
+    margin-top: 14px;
+    background: var(--blue);
+    color: white;
+    border: none;
+    border-radius: 8px;
+    padding: 9px 22px;
+    cursor: pointer;
+    font-size: 0.9rem;
+    font-weight: 700;
+    transition: background .2s;
+  }
+  .check-btn:hover { background: #1e40af; }
+
+  /* SUBMIT AREA */
+  .submit-area {
+    background: white;
+    border-radius: 16px;
+    padding: 30px;
+    margin-top: 20px;
+    box-shadow: 0 4px 24px rgba(0,0,0,0.15);
+    text-align: center;
+  }
+
+  .score-display {
+    font-size: 3rem;
+    font-weight: 800;
+    color: var(--blue);
+    margin: 10px 0;
+  }
+
+  .submit-btn {
+    background: linear-gradient(135deg, var(--blue), #7c3aed);
+    color: white;
+    border: none;
+    border-radius: 12px;
+    padding: 14px 40px;
+    font-size: 1.05rem;
+    font-weight: 700;
+    cursor: pointer;
+    transition: all .2s;
+    box-shadow: 0 4px 16px rgba(26,86,219,0.3);
+    margin-top: 10px;
+  }
+  .submit-btn:hover { transform: translateY(-1px); box-shadow: 0 6px 20px rgba(26,86,219,0.4); }
+
+  .download-btn {
+    background: var(--green);
+    color: white;
+    border: none;
+    border-radius: 12px;
+    padding: 14px 40px;
+    font-size: 1.05rem;
+    font-weight: 700;
+    cursor: pointer;
+    transition: all .2s;
+    margin-top: 10px;
+    margin-left: 10px;
+  }
+  .download-btn:hover { background: #065f46; }
+
+  .section-divider {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    margin: 10px 0 20px;
+  }
+  .section-divider span {
+    background: white;
+    border-radius: 99px;
+    padding: 4px 16px;
+    font-size: 0.8rem;
+    font-weight: 700;
+    color: var(--blue);
+    box-shadow: 0 1px 6px rgba(0,0,0,0.1);
+    white-space: nowrap;
+  }
+  .section-divider::before, .section-divider::after {
+    content: '';
+    flex: 1;
+    height: 2px;
+    background: rgba(255,255,255,0.3);
+    border-radius: 99px;
+  }
+
+  .tf-options { display: flex; gap: 12px; flex-wrap: wrap; }
+  .tf-btn {
+    padding: 10px 28px;
+    border: 2px solid var(--border);
+    border-radius: 10px;
+    cursor: pointer;
+    font-size: 0.95rem;
+    font-weight: 600;
+    background: white;
+    transition: all .2s;
+    color: var(--gray);
+  }
+  .tf-btn:hover { border-color: var(--blue); color: var(--blue); background: var(--blue-light); }
+  .tf-btn.selected-t { border-color: var(--green); background: var(--green-light); color: var(--green); }
+  .tf-btn.selected-f { border-color: var(--red); background: var(--red-light); color: var(--red); }
+
+  @media(max-width:600px) {
+    .student-info { grid-template-columns: 1fr; }
+    .match-grid { grid-template-columns: 1fr; }
+    .dd-row { flex-direction: column; align-items: flex-start; }
+  }
+
+  /* WORD SEARCH */
+  .word-grid-wrap { overflow-x: auto; }
+  .word-grid { display: inline-grid; gap: 2px; margin-bottom: 10px; }
+  .wg-cell {
+    width: 32px; height: 32px;
+    display: flex; align-items: center; justify-content: center;
+    font-weight: 700; font-size: 0.85rem;
+    border: 1px solid #e5e7eb;
+    border-radius: 4px;
+    background: var(--gray-light);
+    cursor: pointer;
+    user-select: none;
+    transition: background .15s;
+    color: var(--gray);
+  }
+  .wg-cell:hover { background: #dbeafe; }
+  .wg-cell.selected { background: #bfdbfe; color: var(--blue); }
+  .wg-cell.found { background: var(--green-light); color: var(--green); border-color: #6ee7b7; }
+  .word-list { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 8px; }
+  .word-to-find {
+    padding: 4px 12px;
+    border: 1.5px solid var(--border);
+    border-radius: 99px;
+    font-size: 0.82rem;
+    font-weight: 600;
+    color: var(--gray);
+    background: white;
+  }
+  .word-to-find.found-word { background: var(--green-light); color: var(--green); border-color: #6ee7b7; text-decoration: line-through; }
+</style>
+</head>
+<body>
+<div class="container">
+
+  <!-- HEADER -->
+  <div class="header">
+    <h1>🔐 Menaxhimi i Akseseve dhe të Drejtave në Sisteme</h1>
+    <p>Plotësoni të gjitha pyetjet dhe klikoni "Dorëzo" në fund</p>
+    <div class="student-info">
+      <input type="text" id="emri" placeholder="✏️ Emri" required="">
+      <input type="text" id="mbiemri" placeholder="✏️ Mbiemri" required="">
+      <input type="text" id="klasa" placeholder="🏫 Klasa" required="">
+    </div>
+    <div style="margin-top:16px">
+      <button class="download-btn" style="margin-left:0;font-size:0.9rem;padding:10px 24px;background:#1a56db" onclick="downloadExerciseFile()">⬇️ Shkarko Ushtrimin (HTML)</button>
+    </div>
+  </div>
+
+  <!-- PROGRESS PANEL -->
+  <div class="progress-panel">
+    <div class="progress-top">
+      <span class="progress-label">📊 Progresi:</span>
+      <div class="progress-bar-bg"><div class="progress-bar-fill" id="progressBar" style="width: 69%;"></div></div>
+      <span class="progress-label" id="progressText">11 / 16</span>
+    </div>
+    <div class="stats-row">
+      <div class="stat-chip done">✏️ Plotësuara: <span id="statDone">11</span></div>
+      <div class="stat-chip correct">✅ Saktë: <span id="statCorrect">11</span></div>
+      <div class="stat-chip wrong">❌ Gabim: <span id="statWrong">0</span></div>
+      <div class="stat-chip open-chip">📝 Të hapura: <span id="statOpen">0</span>/2</div>
+      <div class="stat-chip pct">🏆 Rezultati: <span id="statPct">85%</span></div>
+    </div>
+    <div class="q-status-grid" id="qDotGrid"><div class="q-dot correct-dot" id="dot-q1" title="Pyetja 1">1</div><div class="q-dot correct-dot" id="dot-q2" title="Pyetja 2">2</div><div class="q-dot correct-dot" id="dot-q3" title="Pyetja 3">3</div><div class="q-dot correct-dot" id="dot-q4" title="Pyetja 4">4</div><div class="q-dot correct-dot" id="dot-q5" title="Pyetja 5">5</div><div class="q-dot correct-dot" id="dot-q6" title="Pyetja 6">6</div><div class="q-dot correct-dot" id="dot-q7" title="Pyetja 7">7</div><div class="q-dot correct-dot" id="dot-q8" title="Pyetja 8">8</div><div class="q-dot correct-dot" id="dot-q9" title="Pyetja 9">9</div><div class="q-dot correct-dot" id="dot-q10" title="Pyetja 10">10</div><div class="q-dot correct-dot" id="dot-q11" title="Pyetja 11">11</div><div class="q-dot open-dot" id="dot-q12" title="Pyetja 12">12</div><div class="q-dot" id="dot-q13" title="Pyetja 13">13</div><div class="q-dot correct-dot" id="dot-q14" title="Pyetja 14">14</div><div class="q-dot correct-dot" id="dot-q15" title="Pyetja 15">15</div><div class="q-dot open-dot" id="dot-q16" title="Pyetja 16">16</div></div>
+  </div>
+
+  <!-- SECTION 1 -->
+  <div class="section-divider"><span>📚 Seksioni 1 — Pyetje me Opsione</span></div>
+
+  <!-- Q1 MC -->
+  <div class="q-card" id="q1">
+    <div class="q-meta">
+      <div class="q-num">1</div>
+      <span class="q-type-badge badge-mc">Zgjedhje e shumëfishtë</span>
+    </div>
+    <div class="q-text">Çfarë kuptojmë me termin "akses" në sistemet kompjuterike?</div>
+    <button class="hint-btn" onclick="toggleHint('h1')">💡 Shfaq ndihmën</button>
+    <div class="hint-box" id="h1">Mendoni rreth mundësisë për të përdorur diçka në kompjuter...</div>
+    <div class="options" id="q1opts">
+      <label class="option"><input type="radio" name="q1" value="a" disabled=""><span>Mundësia për të instaluar programe të reja</span></label>
+      <label class="option correct"><input type="radio" name="q1" value="b" disabled=""><span>Mundësia për të përdorur burimet dhe informacionet në sistem</span></label>
+      <label class="option"><input type="radio" name="q1" value="c" disabled=""><span>Mundësia për të fshirë të dhënat e sistemit</span></label>
+      <label class="option"><input type="radio" name="q1" value="d" disabled=""><span>Mundësia për të ndryshuar fjalëkalimet e të tjerëve</span></label>
+    </div>
+    <button class="check-btn" onclick="checkMC('q1','b')" disabled="">✓ Kontrollo</button>
+    <div class="feedback correct" id="q1-fb" style="display: block;">✅ Saktë! Bravo!</div>
+  </div>
+
+  <!-- Q2 MC -->
+  <div class="q-card" id="q2">
+    <div class="q-meta">
+      <div class="q-num">2</div>
+      <span class="q-type-badge badge-mc">Zgjedhje e shumëfishtë</span>
+    </div>
+    <div class="q-text">Cila e drejtë lejon hapjen e dokumenteve pa i modifikuar ato?</div>
+    <div class="options">
+      <label class="option"><input type="radio" name="q2" value="a" disabled=""><span>Write (Shkrim)</span></label>
+      <label class="option"><input type="radio" name="q2" value="b" disabled=""><span>Execute (Ekzekutim)</span></label>
+      <label class="option correct"><input type="radio" name="q2" value="c" disabled=""><span>Read (Lexim)</span></label>
+      <label class="option"><input type="radio" name="q2" value="d" disabled=""><span>Full Control (Kontroll i plotë)</span></label>
+    </div>
+    <button class="check-btn" onclick="checkMC('q2','c')" disabled="">✓ Kontrollo</button>
+    <div class="feedback correct" id="q2-fb" style="display: block;">✅ Saktë! Bravo!</div>
+  </div>
+
+  <!-- Q3 MC -->
+  <div class="q-card" id="q3">
+    <div class="q-meta">
+      <div class="q-num">3</div>
+      <span class="q-type-badge badge-mc">Zgjedhje e shumëfishtë</span>
+    </div>
+    <div class="q-text">Çfarë nënkupton parimi "Least Privilege"?</div>
+    <button class="hint-btn" onclick="toggleHint('h3')">💡 Shfaq ndihmën</button>
+    <div class="hint-box" id="h3">Mendoni: sa të drejta duhet të ketë një person?</div>
+    <div class="options">
+      <label class="option"><input type="radio" name="q3" value="a" disabled=""><span>Çdo përdorues të ketë akses total në sistem</span></label>
+      <label class="option"><input type="radio" name="q3" value="b" disabled=""><span>Askush nuk duhet të ketë akses në sistem</span></label>
+      <label class="option correct"><input type="radio" name="q3" value="c" disabled=""><span>Përdoruesi të ketë vetëm ato të drejta që i nevojiten për punën e tij</span></label>
+      <label class="option"><input type="radio" name="q3" value="d" disabled=""><span>Administratori të ketë të njëjtat të drejta si nxënësit</span></label>
+    </div>
+    <button class="check-btn" onclick="checkMC('q3','c')" disabled="">✓ Kontrollo</button>
+    <div class="feedback correct" id="q3-fb" style="display: block;">✅ Saktë! Bravo!</div>
+  </div>
+
+  <!-- SECTION 2 -->
+  <div class="section-divider"><span>✅ Seksioni 2 — E Saktë / E Gabuar</span></div>
+
+  <!-- Q4 TF -->
+  <div class="q-card">
+    <div class="q-meta">
+      <div class="q-num">4</div>
+      <span class="q-type-badge badge-tf">E Saktë / E Gabuar</span>
+    </div>
+    <div class="q-text">Nxënësi mund të modifikojë notat e tij në sistemin e shkollës elektronike.</div>
+    <div class="tf-options">
+      <button class="tf-btn" onclick="selectTF(this, 'q4', 'e', false)" disabled="">✅ E Saktë</button>
+      <button class="tf-btn selected-f" onclick="selectTF(this, 'q4', 'g', true)" disabled="">❌ E Gabuar</button>
+    </div>
+    <div class="feedback correct" id="q4-fb" style="display: block;">✅ Saktë! Bravo!</div>
+  </div>
+
+  <!-- Q5 TF -->
+  <div class="q-card">
+    <div class="q-meta">
+      <div class="q-num">5</div>
+      <span class="q-type-badge badge-tf">E Saktë / E Gabuar</span>
+    </div>
+    <div class="q-text">RBAC qëndron për "Role-Based Access Control".</div>
+    <div class="tf-options">
+      <button class="tf-btn selected-t" onclick="selectTF(this, 'q5', 'e', true)" disabled="">✅ E Saktë</button>
+      <button class="tf-btn" onclick="selectTF(this, 'q5', 'g', false)" disabled="">❌ E Gabuar</button>
+    </div>
+    <div class="feedback correct" id="q5-fb" style="display: block;">✅ Saktë! Bravo!</div>
+  </div>
+
+  <!-- Q6 TF -->
+  <div class="q-card">
+    <div class="q-meta">
+      <div class="q-num">6</div>
+      <span class="q-type-badge badge-tf">E Saktë / E Gabuar</span>
+    </div>
+    <div class="q-text">Administratori i sistemit ka akses të kufizuar dhe nuk mund të shtojë ose fshijë përdorues.</div>
+    <div class="tf-options">
+      <button class="tf-btn" onclick="selectTF(this, 'q6', 'e', false)" disabled="">✅ E Saktë</button>
+      <button class="tf-btn selected-f" onclick="selectTF(this, 'q6', 'g', true)" disabled="">❌ E Gabuar</button>
+    </div>
+    <div class="feedback correct" id="q6-fb" style="display: block;">✅ Saktë! Bravo!</div>
+  </div>
+
+  <!-- SECTION 3 -->
+  <div class="section-divider"><span>🔤 Seksioni 3 — Plotëso Boshllëqet</span></div>
+
+  <!-- Q7 FILL -->
+  <div class="q-card">
+    <div class="q-meta">
+      <div class="q-num">7</div>
+      <span class="q-type-badge badge-fill">Plotëso boshllëqet</span>
+    </div>
+    <div class="q-text">Plotëso fjalitë e mëposhtme:</div>
+    <button class="hint-btn" onclick="toggleHint('h7')">💡 Shfaq ndihmën</button>
+    <div class="hint-box" id="h7">Fjalët: Read, Write, Execute, Full Control</div>
+    <div class="fill-wrap">
+      <span>E drejta</span>
+      <input class="blank-input" id="fill7a" placeholder="___" style="width:90px">
+      <span>lejon hapjen e dokumenteve, ndërsa e drejta</span>
+      <input class="blank-input" id="fill7b" placeholder="___" style="width:80px">
+      <span>lejon ndryshimin e tyre. Kontrolli total quhet</span>
+      <input class="blank-input" id="fill7c" placeholder="___" style="width:120px">
+      <span>.</span>
+    </div>
+    <button class="check-btn" onclick="checkFill7()">✓ Kontrollo</button>
+    <div class="feedback correct" id="q7-fb" style="display: block;">✅ Saktë! Të tria boshllëqet janë plotësuar drejt!</div>
+  </div>
+
+  <!-- Q8 FILL -->
+  <div class="q-card">
+    <div class="q-meta">
+      <div class="q-num">8</div>
+      <span class="q-type-badge badge-fill">Plotëso boshllëqet</span>
+    </div>
+    <div class="q-text">Plotëso:</div>
+    <div class="fill-wrap">
+      <span>Në Linux, komanda</span>
+      <input class="blank-input" id="fill8a" placeholder="___" style="width:80px">
+      <span>përdoret për të ndryshuar të drejtat e skedarëve, ndërsa</span>
+      <input class="blank-input" id="fill8b" placeholder="___" style="width:80px">
+      <span>ndryshon pronarin e skedarit.</span>
+    </div>
+    <button class="check-btn" onclick="checkFill8()">✓ Kontrollo</button>
+    <div class="feedback correct" id="q8-fb" style="display: block;">✅ Saktë! chmod dhe chown janë komandat e duhura!</div>
+  </div>
+
+  <!-- SECTION 4 -->
+  <div class="section-divider"><span>🎯 Seksioni 4 — Drag &amp; Drop</span></div>
+
+  <!-- Q9 DRAG DROP -->
+  <div class="q-card">
+    <div class="q-meta">
+      <div class="q-num">9</div>
+      <span class="q-type-badge badge-dd">Drag &amp; Drop</span>
+    </div>
+    <div class="q-text">Zvarrit çdo rol te privilegjet e duhura:</div>
+    <div class="dd-area">
+      <div class="dd-row">
+        <div class="dd-label">👨‍🎓 Nxënësi</div>
+        <div class="dd-arrow">→</div>
+        <div class="dd-drop" id="drop-nxenes" ondrop="dropChip(event,'drop-nxenes')" ondragover="event.preventDefault(); this.classList.add('over')" ondragleave="this.classList.remove('over')" data-val="lexim"><div class="chip placed" draggable="false" data-val="lexim" ondragstart="dragStart(event)" style="cursor: default;">📖 Vetëm Lexim</div></div>
+      </div>
+      <div class="dd-row">
+        <div class="dd-label">👨‍🏫 Profesori</div>
+        <div class="dd-arrow">→</div>
+        <div class="dd-drop" id="drop-prof" ondrop="dropChip(event,'drop-prof')" ondragover="event.preventDefault(); this.classList.add('over')" ondragleave="this.classList.remove('over')" data-val="lexim-shkrim"><div class="chip placed" draggable="false" data-val="lexim-shkrim" ondragstart="dragStart(event)" style="cursor: default;">📖✏️ Lexim dhe Shkrim</div></div>
+      </div>
+      <div class="dd-row">
+        <div class="dd-label">🛠️ Administratori</div>
+        <div class="dd-arrow">→</div>
+        <div class="dd-drop" id="drop-admin" ondrop="dropChip(event,'drop-admin')" ondragover="event.preventDefault(); this.classList.add('over')" ondragleave="this.classList.remove('over')" data-val="kontroll-plot"><div class="chip placed" draggable="false" data-val="kontroll-plot" ondragstart="dragStart(event)" style="cursor: default;">🔑 Kontroll i Plotë</div></div>
+      </div>
+    </div>
+    <div class="dd-chips" id="chips9">
+      <div class="chip placed" draggable="false" data-val="lexim" ondragstart="dragStart(event)" style="opacity: 0.4;">📖 Vetëm Lexim</div>
+      <div class="chip placed" draggable="false" data-val="lexim-shkrim" ondragstart="dragStart(event)" style="opacity: 0.4;">📖✏️ Lexim dhe Shkrim</div>
+      <div class="chip placed" draggable="false" data-val="kontroll-plot" ondragstart="dragStart(event)" style="opacity: 0.4;">🔑 Kontroll i Plotë</div>
+    </div>
+    <button class="check-btn" onclick="checkDD9()">✓ Kontrollo</button>
+    <div class="feedback correct" id="q9-fb" style="display: block;">✅ Saktë! Rolet janë vendosur drejt!</div>
+  </div>
+
+  <!-- Q10 DRAG DROP RBAC -->
+  <div class="q-card">
+    <div class="q-meta">
+      <div class="q-num">10</div>
+      <span class="q-type-badge badge-dd">Drag &amp; Drop</span>
+    </div>
+    <div class="q-text">Zvarrit çdo mjet (tool) te sistemi i duhur ku përdoret:</div>
+    <div class="dd-area">
+      <div class="dd-row">
+        <div class="dd-label">🪟 Windows</div>
+        <div class="dd-arrow">→</div>
+        <div class="dd-drop" id="drop-win" ondrop="dropChip(event,'drop-win')" ondragover="event.preventDefault(); this.classList.add('over')" ondragleave="this.classList.remove('over')" data-val="ad"><div class="chip placed" draggable="false" data-val="ad" ondragstart="dragStart(event)" style="cursor: default;">Active Directory</div></div>
+      </div>
+      <div class="dd-row">
+        <div class="dd-label">🐧 Linux</div>
+        <div class="dd-arrow">→</div>
+        <div class="dd-drop" id="drop-linux" ondrop="dropChip(event,'drop-linux')" ondragover="event.preventDefault(); this.classList.add('over')" ondragleave="this.classList.remove('over')" data-val="chmod"><div class="chip placed" draggable="false" data-val="chmod" ondragstart="dragStart(event)" style="cursor: default;">chmod / chown</div></div>
+      </div>
+      <div class="dd-row">
+        <div class="dd-label">☁️ Cloud</div>
+        <div class="dd-arrow">→</div>
+        <div class="dd-drop" id="drop-cloud" ondrop="dropChip(event,'drop-cloud')" ondragover="event.preventDefault(); this.classList.add('over')" ondragleave="this.classList.remove('over')" data-val="aws"><div class="chip placed" draggable="false" data-val="aws" ondragstart="dragStart(event)" style="cursor: default;">AWS IAM</div></div>
+      </div>
+    </div>
+    <div class="dd-chips" id="chips10">
+      <div class="chip placed" draggable="false" data-val="ad" ondragstart="dragStart(event)" style="opacity: 0.4;">Active Directory</div>
+      <div class="chip placed" draggable="false" data-val="chmod" ondragstart="dragStart(event)" style="opacity: 0.4;">chmod / chown</div>
+      <div class="chip placed" draggable="false" data-val="aws" ondragstart="dragStart(event)" style="opacity: 0.4;">AWS IAM</div>
+    </div>
+    <button class="check-btn" onclick="checkDD10()">✓ Kontrollo</button>
+    <div class="feedback correct" id="q10-fb" style="display: block;">✅ Saktë! Mjetet janë vendosur drejt!</div>
+  </div>
+
+  <!-- SECTION 5 -->
+  <div class="section-divider"><span>🔗 Seksioni 5 — Bashko Çiftet</span></div>
+
+  <!-- Q11 MATCH -->
+  <div class="q-card">
+    <div class="q-meta">
+      <div class="q-num">11</div>
+      <span class="q-type-badge badge-match">Bashko çiftet</span>
+    </div>
+    <div class="q-text">Bashko secilën të drejtë me përshkrimin e saktë:</div>
+    <div style="display:flex; flex-direction:column; gap:10px; margin-top:8px;">
+      <div style="display:flex; align-items:center; gap:10px; flex-wrap:wrap;">
+        <div class="match-item" style="background:var(--blue-light);border-color:#93c5fd;font-weight:600;min-width:140px;padding:10px 14px;border:2px solid #93c5fd;border-radius:8px;font-size:0.88rem;color:var(--blue);">Read</div>
+        <div class="dd-arrow">→</div>
+        <select id="match11a" onchange="updateProgress()">
+          <option value="">-- Zgjidh --</option>
+          <option value="ekz">Lejon ekzekutimin e programeve</option>
+          <option value="hap">Lejon hapjen e dokumenteve pa modifikime</option>
+          <option value="ndry">Lejon ndryshimin dhe krijimin e dokumenteve</option>
+          <option value="plot">Kontroll total mbi burimet</option>
+        </select>
+      </div>
+      <div style="display:flex; align-items:center; gap:10px; flex-wrap:wrap;">
+        <div class="match-item" style="background:var(--blue-light);border-color:#93c5fd;font-weight:600;min-width:140px;padding:10px 14px;border:2px solid #93c5fd;border-radius:8px;font-size:0.88rem;color:var(--blue);">Write</div>
+        <div class="dd-arrow">→</div>
+        <select id="match11b" onchange="updateProgress()">
+          <option value="">-- Zgjidh --</option>
+          <option value="ekz">Lejon ekzekutimin e programeve</option>
+          <option value="hap">Lejon hapjen e dokumenteve pa modifikime</option>
+          <option value="ndry">Lejon ndryshimin dhe krijimin e dokumenteve</option>
+          <option value="plot">Kontroll total mbi burimet</option>
+        </select>
+      </div>
+      <div style="display:flex; align-items:center; gap:10px; flex-wrap:wrap;">
+        <div class="match-item" style="background:var(--blue-light);border-color:#93c5fd;font-weight:600;min-width:140px;padding:10px 14px;border:2px solid #93c5fd;border-radius:8px;font-size:0.88rem;color:var(--blue);">Execute</div>
+        <div class="dd-arrow">→</div>
+        <select id="match11c" onchange="updateProgress()">
+          <option value="">-- Zgjidh --</option>
+          <option value="ekz">Lejon ekzekutimin e programeve</option>
+          <option value="hap">Lejon hapjen e dokumenteve pa modifikime</option>
+          <option value="ndry">Lejon ndryshimin dhe krijimin e dokumenteve</option>
+          <option value="plot">Kontroll total mbi burimet</option>
+        </select>
+      </div>
+      <div style="display:flex; align-items:center; gap:10px; flex-wrap:wrap;">
+        <div class="match-item" style="background:var(--blue-light);border-color:#93c5fd;font-weight:600;min-width:140px;padding:10px 14px;border:2px solid #93c5fd;border-radius:8px;font-size:0.88rem;color:var(--blue);">Full Control</div>
+        <div class="dd-arrow">→</div>
+        <select id="match11d" onchange="updateProgress()">
+          <option value="">-- Zgjidh --</option>
+          <option value="ekz">Lejon ekzekutimin e programeve</option>
+          <option value="hap">Lejon hapjen e dokumenteve pa modifikime</option>
+          <option value="ndry">Lejon ndryshimin dhe krijimin e dokumenteve</option>
+          <option value="plot">Kontroll total mbi burimet</option>
+        </select>
+      </div>
+    </div>
+    <button class="check-btn" onclick="checkMatch11()">✓ Kontrollo</button>
+    <div class="feedback correct" id="q11-fb" style="display: block;">✅ Saktë! Të gjitha çiftet janë të sakta!</div>
+  </div>
+
+  <!-- SECTION 6 -->
+  <div class="section-divider"><span>📝 Seksioni 6 — Pyetje të Hapura</span></div>
+
+  <!-- Q12 OPEN -->
+  <div class="q-card">
+    <div class="q-meta">
+      <div class="q-num">12</div>
+      <span class="q-type-badge badge-open">Pyetje e hapur</span>
+    </div>
+    <div class="q-text">Shpjego me fjalët tuaja pse është i rëndësishëm menaxhimi i akseseve në sisteme. Jepni të paktën dy arsye.</div>
+    <button class="hint-btn" onclick="toggleHint('h12')">💡 Shfaq ndihmën</button>
+    <div class="hint-box" id="h12">Mendoni për: humbjen e të dhënave, sigurinë, sulmet kibernetike...</div>
+    <textarea id="q12" placeholder="Shkruani përgjigjen tuaj këtu..." oninput="updateProgress()"></textarea>
+    <div class="feedback neutral" id="q12-fb" style="display:block">📝 Kjo pyetje vlerësohet nga mësuesi/ja.</div>
+  </div>
+
+  <!-- Q13 OPEN -->
+  <div class="q-card">
+    <div class="q-meta">
+      <div class="q-num">13</div>
+      <span class="q-type-badge badge-open">Pyetje e hapur</span>
+    </div>
+    <div class="q-text">Çfarë gabimesh bëhen shpesh gjatë menaxhimit të akseseve? Jepni shembull real ose të imagjinuar.</div>
+    <textarea id="q13" placeholder="Shkruani përgjigjen tuaj këtu..." oninput="updateProgress()"></textarea>
+    <div class="feedback neutral" id="q13-fb" style="display:block">📝 Kjo pyetje vlerësohet nga mësuesi/ja.</div>
+  </div>
+
+  <!-- SECTION 7 -->
+  <div class="section-divider"><span>🔢 Seksioni 7 — Rendit Hapat</span></div>
+
+  <!-- Q14 ORDER -->
+  <div class="q-card">
+    <div class="q-meta">
+      <div class="q-num">14</div>
+      <span class="q-type-badge badge-order">Rendit hapat</span>
+    </div>
+    <div class="q-text">Rendit hapat e saktë për të vendosur të drejtat e aksesit në Windows (zvarrit për të ndryshuar rendin):</div>
+    <div class="order-list" id="orderList14">
+      <div class="order-item" draggable="true" data-step="1" ondragstart="orderDragStart(event,14)" ondragover="orderDragOver(event)" ondrop="orderDrop(event,14)">
+        <span class="order-handle">⋮⋮</span>
+        <div class="order-num" id="on14-1">1</div>
+        <span>Klikoni me të djathtën te dosja/skedari → Properties</span>
+      </div><div class="order-item" draggable="true" data-step="2" ondragstart="orderDragStart(event,14)" ondragover="orderDragOver(event)" ondrop="orderDrop(event,14)">
+        <span class="order-handle">⋮⋮</span>
+        <div class="order-num" id="on14-2">2</div>
+        <span>Hapni tab-in Security</span>
+      </div><div class="order-item" draggable="true" data-step="3" ondragstart="orderDragStart(event,14)" ondragover="orderDragOver(event)" ondrop="orderDrop(event,14)">
+        <span class="order-handle">⋮⋮</span>
+        <div class="order-num" id="on14-3">3</div>
+        <span>Zgjidhni përdoruesin/grupin dhe klikoni Edit</span>
+      </div>
+      
+      
+    </div>
+    <button class="check-btn" onclick="checkOrder14()">✓ Kontrollo</button>
+    <div class="feedback correct" id="q14-fb" style="display: block;">✅ Saktë! Hapat janë në rendin e duhur!</div>
+  </div>
+
+  <!-- SECTION 8 -->
+  <div class="section-divider"><span>🔍 Seksioni 8 — Gjej Fjalën</span></div>
+
+  <!-- Q15 WORD SEARCH -->
+  <div class="q-card">
+    <div class="q-meta">
+      <div class="q-num">15</div>
+      <span class="q-type-badge badge-fill">Gjej fjalën</span>
+    </div>
+    <div class="q-text">Gjeni 5 fjalë kyçe nga lënda në rrjetën e shkronjave:</div>
+    <div class="word-list" id="wordList15">
+      <span class="word-to-find found-word" data-word="READ">READ</span>
+      <span class="word-to-find found-word" data-word="ADMIN">ADMIN</span>
+      <span class="word-to-find found-word" data-word="RBAC">RBAC</span>
+      <span class="word-to-find found-word" data-word="ROLE">ROLE</span>
+      <span class="word-to-find found-word" data-word="WRITE">WRITE</span>
+    </div>
+    <div class="word-grid-wrap" style="margin-top:12px">
+      <div class="word-grid" id="wordGrid" style="grid-template-columns: repeat(10,32px)"><div class="wg-cell found" data-r="0" data-c="0">R</div><div class="wg-cell found" data-r="0" data-c="1">E</div><div class="wg-cell found" data-r="0" data-c="2">A</div><div class="wg-cell found" data-r="0" data-c="3">D</div><div class="wg-cell" data-r="0" data-c="4">P</div><div class="wg-cell" data-r="0" data-c="5">Q</div><div class="wg-cell" data-r="0" data-c="6">Z</div><div class="wg-cell" data-r="0" data-c="7">M</div><div class="wg-cell" data-r="0" data-c="8">N</div><div class="wg-cell" data-r="0" data-c="9">O</div><div class="wg-cell" data-r="1" data-c="0">B</div><div class="wg-cell found" data-r="1" data-c="1">A</div><div class="wg-cell found" data-r="1" data-c="2">D</div><div class="wg-cell found" data-r="1" data-c="3">M</div><div class="wg-cell found" data-r="1" data-c="4">I</div><div class="wg-cell found" data-r="1" data-c="5">N</div><div class="wg-cell" data-r="1" data-c="6">X</div><div class="wg-cell" data-r="1" data-c="7">Y</div><div class="wg-cell" data-r="1" data-c="8">L</div><div class="wg-cell" data-r="1" data-c="9">K</div><div class="wg-cell found" data-r="2" data-c="0">W</div><div class="wg-cell found" data-r="2" data-c="1">R</div><div class="wg-cell found" data-r="2" data-c="2">I</div><div class="wg-cell found" data-r="2" data-c="3">T</div><div class="wg-cell found" data-r="2" data-c="4">E</div><div class="wg-cell" data-r="2" data-c="5">F</div><div class="wg-cell" data-r="2" data-c="6">G</div><div class="wg-cell" data-r="2" data-c="7">H</div><div class="wg-cell" data-r="2" data-c="8">I</div><div class="wg-cell" data-r="2" data-c="9">J</div><div class="wg-cell found" data-r="3" data-c="0">R</div><div class="wg-cell found" data-r="3" data-c="1">B</div><div class="wg-cell found" data-r="3" data-c="2">A</div><div class="wg-cell found" data-r="3" data-c="3">C</div><div class="wg-cell" data-r="3" data-c="4">U</div><div class="wg-cell" data-r="3" data-c="5">V</div><div class="wg-cell" data-r="3" data-c="6">W</div><div class="wg-cell" data-r="3" data-c="7">X</div><div class="wg-cell" data-r="3" data-c="8">Y</div><div class="wg-cell" data-r="3" data-c="9">Z</div><div class="wg-cell found" data-r="4" data-c="0">R</div><div class="wg-cell found" data-r="4" data-c="1">O</div><div class="wg-cell found" data-r="4" data-c="2">L</div><div class="wg-cell found" data-r="4" data-c="3">E</div><div class="wg-cell" data-r="4" data-c="4">S</div><div class="wg-cell" data-r="4" data-c="5">T</div><div class="wg-cell" data-r="4" data-c="6">U</div><div class="wg-cell" data-r="4" data-c="7">V</div><div class="wg-cell" data-r="4" data-c="8">W</div><div class="wg-cell" data-r="4" data-c="9">X</div><div class="wg-cell" data-r="5" data-c="0">A</div><div class="wg-cell" data-r="5" data-c="1">B</div><div class="wg-cell" data-r="5" data-c="2">C</div><div class="wg-cell" data-r="5" data-c="3">D</div><div class="wg-cell" data-r="5" data-c="4">E</div><div class="wg-cell" data-r="5" data-c="5">F</div><div class="wg-cell" data-r="5" data-c="6">G</div><div class="wg-cell" data-r="5" data-c="7">H</div><div class="wg-cell" data-r="5" data-c="8">I</div><div class="wg-cell" data-r="5" data-c="9">J</div><div class="wg-cell" data-r="6" data-c="0">K</div><div class="wg-cell" data-r="6" data-c="1">L</div><div class="wg-cell" data-r="6" data-c="2">M</div><div class="wg-cell" data-r="6" data-c="3">N</div><div class="wg-cell" data-r="6" data-c="4">O</div><div class="wg-cell" data-r="6" data-c="5">P</div><div class="wg-cell" data-r="6" data-c="6">Q</div><div class="wg-cell" data-r="6" data-c="7">R</div><div class="wg-cell" data-r="6" data-c="8">S</div><div class="wg-cell" data-r="6" data-c="9">T</div><div class="wg-cell" data-r="7" data-c="0">U</div><div class="wg-cell" data-r="7" data-c="1">V</div><div class="wg-cell" data-r="7" data-c="2">W</div><div class="wg-cell" data-r="7" data-c="3">X</div><div class="wg-cell" data-r="7" data-c="4">Y</div><div class="wg-cell" data-r="7" data-c="5">Z</div><div class="wg-cell" data-r="7" data-c="6">A</div><div class="wg-cell" data-r="7" data-c="7">B</div><div class="wg-cell" data-r="7" data-c="8">C</div><div class="wg-cell" data-r="7" data-c="9">D</div></div>
+    </div>
+    <div class="feedback correct" id="q15-fb" style="display: block;">✅ Bravo! Keni gjetur të gjitha 5 fjalët!</div>
+  </div>
+
+  <!-- SECTION 9 -->
+  <div class="section-divider"><span>🎨 Seksioni 9 — Vizatim / Skicim</span></div>
+
+  <!-- Q16 DRAW -->
+  <div class="q-card">
+    <div class="q-meta">
+      <div class="q-num">16</div>
+      <span class="q-type-badge badge-draw">Vizatim</span>
+    </div>
+    <div class="q-text">Vizatoni një diagram të thjeshtë që tregon hierarkinë e roleve: Administratori → Profesori → Nxënësi (me shigjetat e aksesit):</div>
+    <div class="canvas-wrap">
+      <canvas id="drawCanvas" width="820" height="250"></canvas>
+      <div class="canvas-tools">
+        <div class="color-pick">
+          <div class="color-dot" style="background:#1a56db" data-c="#1a56db" onclick="setColor(this)"></div>
+          <div class="color-dot" style="background:#c81e1e" data-c="#c81e1e" onclick="setColor(this)"></div>
+          <div class="color-dot" style="background:#057a55" data-c="#057a55" onclick="setColor(this)"></div>
+          <div class="color-dot active" style="background:#374151" data-c="#374151" onclick="setColor(this)"></div>
+          <div class="color-dot" style="background:#d97706" data-c="#d97706" onclick="setColor(this)"></div>
+        </div>
+        <input type="range" id="brushSize" min="1" max="18" value="3" style="width:80px">
+        <span style="font-size:0.78rem;color:#6b7280">Trashësia</span>
+        <button onclick="clearCanvas()">🗑️ Pastro</button>
+        <button onclick="undoDraw()">↩️ Zhbëj</button>
+      </div>
+    </div>
+    <div class="feedback neutral" style="display:block;margin-top:10px">🎨 Diagrami vlerësohet nga mësuesi/ja.</div>
+  </div>
+
+  <!-- SUBMIT -->
+  <div class="submit-area">
+    <div id="preSubmit">
+      <h2 style="color:var(--blue);margin-bottom:8px">✅ Gati për dorëzim?</h2>
+      <p style="color:#6b7280;margin-bottom:12px">Sigurohuni që keni plotësuar emrin, mbiemrin dhe klasën tuaj.</p>
+      <button class="submit-btn" onclick="submitExercise()">🚀 Dorëzo Ushtrimin</button>
+    </div>
+    <div id="postSubmit" style="display:none">
+      <div style="font-size:2.5rem;margin-bottom:8px">🏆</div>
+      <h2 style="color:var(--blue)">Ushtrim i dorëzuar!</h2>
+      <p id="studentNameDisplay" style="color:#6b7280;margin:6px 0 16px"></p>
+      <div style="display:flex;justify-content:center;gap:16px;flex-wrap:wrap;margin-bottom:16px">
+        <div style="background:var(--green-light);border:2px solid #6ee7b7;border-radius:12px;padding:12px 20px;text-align:center">
+          <div class="score-display" id="scoreDisplay" style="font-size:2rem;margin:0;color:var(--green)">--</div>
+          <div style="font-size:0.78rem;color:var(--green);font-weight:700;text-transform:uppercase">✅ Saktë</div>
+        </div>
+        <div style="background:var(--red-light);border:2px solid #fca5a5;border-radius:12px;padding:12px 20px;text-align:center">
+          <div style="font-size:2rem;font-weight:800;color:var(--red)" id="scoreWrong">--</div>
+          <div style="font-size:0.78rem;color:var(--red);font-weight:700;text-transform:uppercase">❌ Gabim</div>
+        </div>
+        <div style="background:var(--purple-light);border:2px solid #c4b5fd;border-radius:12px;padding:12px 20px;text-align:center">
+          <div style="font-size:2rem;font-weight:800;color:var(--purple)" id="scoreOpen">--</div>
+          <div style="font-size:0.78rem;color:var(--purple);font-weight:700;text-transform:uppercase">📝 Të hapura</div>
+        </div>
+        <div style="background:var(--orange-light);border:2px solid #fcd34d;border-radius:12px;padding:12px 20px;text-align:center">
+          <div style="font-size:2rem;font-weight:800;color:var(--orange)" id="scorePct">--%</div>
+          <div style="font-size:0.78rem;color:var(--orange);font-weight:700;text-transform:uppercase">🏆 Rezultati</div>
+        </div>
+      </div>
+      <p style="color:#6b7280;margin-bottom:16px;font-size:0.88rem">Pyetjet e hapura (Q12, Q13) dhe vizatimi (Q16) vlerësohen nga mësuesi/ja.</p>
+
+      <!-- INLINE SUMMARY TABLE -->
+      <div style="text-align:left;margin:16px 0;border:1px solid var(--border);border-radius:12px;overflow:hidden">
+        <div style="padding:12px 18px;background:var(--blue-light);font-weight:700;color:var(--blue);font-size:0.9rem;border-bottom:1px solid var(--border)">
+          📋 Tabela e të gjitha përgjigjeve
+        </div>
+        <style>
+          .sum-num { text-align:center; font-weight:700; color:var(--blue); padding:8px 8px; vertical-align:top; }
+          .sum-table td { padding:8px 10px; border-bottom:1px solid #f3f4f6; font-size:0.85rem; vertical-align:top; }
+          .sum-table tr:last-child td { border-bottom:none; }
+          .sum-ok { color:var(--green); font-weight:700; }
+          .sum-ng { color:var(--red); font-weight:700; }
+          .sum-open { color:var(--purple); font-weight:700; }
+          .sum-skip { color:#9ca3af; }
+          .sum-type { font-size:0.75rem; color:#9ca3af; }
+          .sum-answer { margin-top:3px; }
+          .ok-ans { color:var(--green); }
+          .ng-ans { color:var(--red); }
+        </style>
+        <table class="sum-table" style="width:100%;border-collapse:collapse">
+          <thead>
+            <tr style="background:#f9fafb;border-bottom:2px solid var(--border)">
+              <th style="padding:8px;text-align:center;font-size:0.75rem;color:#6b7280;text-transform:uppercase">#</th>
+              <th style="padding:8px;text-align:left;font-size:0.75rem;color:#6b7280;text-transform:uppercase">Pyetja</th>
+              <th style="padding:8px;text-align:left;font-size:0.75rem;color:#6b7280;text-transform:uppercase">Rezultati</th>
+              <th style="padding:8px;text-align:left;font-size:0.75rem;color:#6b7280;text-transform:uppercase">Përgjigja</th>
+            </tr>
+          </thead>
+          <tbody id="summaryTable"></tbody>
+        </table>
+      </div>
+
+      <button class="download-btn" onclick="downloadResults()">⬇️ Shkarko Raportin e Plotë (HTML)</button>
+    </div>
+  </div>
+
+</div>
+
+<script>
+// ===================== STATE =====================
+// answered[qid] = { correct: true/false/null(open), answer: string, checked: bool }
+let answered = {};
+const autoQids = ['q1','q2','q3','q4','q5','q6','q7','q8','q9','q10','q11','q14','q15'];
+const openQids = ['q12','q13'];
+const totalQ = 16;
+
+// Build dot grid
+function buildDotGrid() {
+  const grid = document.getElementById('qDotGrid');
+  grid.innerHTML = '';
+  for (let i = 1; i <= totalQ; i++) {
+    const dot = document.createElement('div');
+    dot.className = 'q-dot';
+    dot.id = 'dot-q' + i;
+    dot.textContent = i;
+    dot.title = 'Pyetja ' + i;
+    grid.appendChild(dot);
+  }
+}
+buildDotGrid();
+
+// ===================== UTILITIES =====================
+function toggleHint(id) {
+  const b = document.getElementById(id);
+  b.style.display = b.style.display === 'block' ? 'none' : 'block';
+}
+
+function showFeedback(id, correct, msg) {
+  const el = document.getElementById(id);
+  el.style.display = 'block';
+  el.className = 'feedback ' + (correct ? 'correct' : 'wrong');
+  el.textContent = (correct ? '✅ ' : '❌ ') + msg;
+}
+
+function markAnswered(qid, correct, answerText) {
+  answered[qid] = { correct: correct, answer: answerText || '', checked: true };
+  updateDot(qid, correct);
+  updateProgress();
+}
+
+function markOpen(qid, answerText) {
+  answered[qid] = { correct: null, answer: answerText, checked: false };
+  updateDot(qid, null);
+  updateProgress();
+}
+
+function updateDot(qid, correct) {
+  const num = parseInt(qid.replace('q',''));
+  const dot = document.getElementById('dot-q' + num);
+  if (!dot) return;
+  dot.classList.remove('answered','correct-dot','wrong-dot','open-dot');
+  if (correct === null) dot.classList.add('open-dot');
+  else if (correct === true) dot.classList.add('correct-dot');
+  else dot.classList.add('wrong-dot');
+}
+
+function updateProgress() {
+  // Check open questions
+  ['q12','q13'].forEach(id => {
+    const el = document.getElementById(id);
+    if (el && el.value.trim().length > 5) markOpen(id, el.value.trim());
+  });
+
+  const done = Object.keys(answered).length;
+  const correctCount = Object.values(answered).filter(v => v.correct === true).length;
+  const wrongCount = Object.values(answered).filter(v => v.correct === false).length;
+  const openCount = Object.values(answered).filter(v => v.correct === null).length;
+  const autoTotal = autoQids.length;
+  const pct = autoTotal > 0 ? Math.round(correctCount / autoTotal * 100) : 0;
+
+  const progPct = Math.min(100, Math.round(done / totalQ * 100));
+  document.getElementById('progressBar').style.width = progPct + '%';
+  document.getElementById('progressText').textContent = done + ' / ' + totalQ;
+  document.getElementById('statDone').textContent = done;
+  document.getElementById('statCorrect').textContent = correctCount;
+  document.getElementById('statWrong').textContent = wrongCount;
+  document.getElementById('statOpen').textContent = openCount;
+  document.getElementById('statPct').textContent = pct + '%';
+}
+
+// ===================== MC =====================
+const mcAnswers = {
+  q1: { correct:'b', texts:{ a:'Mundësia për të instaluar programe të reja', b:'Mundësia për të përdorur burimet dhe informacionet në sistem', c:'Mundësia për të fshirë të dhënat e sistemit', d:'Mundësia për të ndryshuar fjalëkalimet e të tjerëve' }},
+  q2: { correct:'c', texts:{ a:'Write (Shkrim)', b:'Execute (Ekzekutim)', c:'Read (Lexim)', d:'Full Control (Kontroll i plotë)' }},
+  q3: { correct:'c', texts:{ a:'Çdo përdorues të ketë akses total në sistem', b:'Askush nuk duhet të ketë akses në sistem', c:'Përdoruesi të ketë vetëm ato të drejta që i nevojiten për punën e tij', d:'Administratori të ketë të njëjtat të drejta si nxënësit' }},
+};
+
+function checkMC(qid, correctVal) {
+  const sel = document.querySelector(`input[name="${qid}"]:checked`);
+  if (!sel) { alert('Zgjidhni një opsion!'); return; }
+  const correct = sel.value === correctVal;
+  const selectedText = mcAnswers[qid]?.texts[sel.value] || sel.value;
+  const correctText = mcAnswers[qid]?.texts[correctVal] || correctVal;
+  showFeedback(qid + '-fb', correct, correct ? 'Saktë! Bravo!' : `Jo saktë. Përgjigja e saktë: "${correctText}"`);
+  markAnswered(qid, correct, `Zgjidhni: "${selectedText}"${!correct ? ` (E saktë: "${correctText}")` : ''}`);
+  document.querySelectorAll(`input[name="${qid}"]`).forEach(inp => {
+    const opt = inp.closest('.option');
+    if (inp.value === correctVal) opt.classList.add('correct');
+    else if (inp.checked) opt.classList.add('wrong');
+    inp.disabled = true;
+  });
+  document.querySelector(`button[onclick="checkMC('${qid}','${correctVal}')"]`).disabled = true;
+}
+
+// ===================== TF =====================
+function selectTF(btn, qid, choice, isCorrect) {
+  const btns = btn.parentElement.querySelectorAll('.tf-btn');
+  btns.forEach(b => { b.classList.remove('selected-t','selected-f'); b.disabled = true; });
+  btn.classList.add(choice === 'e' ? 'selected-t' : 'selected-f');
+  const choiceTxt = choice === 'e' ? 'E Saktë' : 'E Gabuar';
+  const correctTxt = isCorrect ? choiceTxt : (choice === 'e' ? 'E Gabuar' : 'E Saktë');
+  showFeedback(qid + '-fb', isCorrect, isCorrect ? 'Saktë! Bravo!' : `Jo saktë. Përgjigja e saktë: ${correctTxt}`);
+  markAnswered(qid, isCorrect, `Zgjidhni: "${choiceTxt}"${!isCorrect ? ` (E saktë: "${correctTxt}")` : ''}`);
+}
+
+// ===================== FILL 7 =====================
+function checkFill7() {
+  const a = document.getElementById('fill7a').value.trim();
+  const b = document.getElementById('fill7b').value.trim();
+  const c = document.getElementById('fill7c').value.trim();
+  const aok = a.toLowerCase().includes('read') || a.toLowerCase().includes('lexim');
+  const bok = b.toLowerCase().includes('write') || b.toLowerCase().includes('shkrim');
+  const cok = c.toLowerCase().includes('full') || c.toLowerCase().includes('kontroll');
+  const all = aok && bok && cok;
+  showFeedback('q7-fb', all, all ? 'Saktë! Të tria boshllëqet janë plotësuar drejt!' : `Jo plotësisht saktë. ${!aok?'[Read/Lexim] ':''} ${!bok?'[Write/Shkrim] ':''} ${!cok?'[Full Control]':''}`);
+  markAnswered('q7', all, `1:"${a}", 2:"${b}", 3:"${c}"` + (!all ? ' → (E saktë: Read, Write, Full Control)' : ''));
+}
+
+function checkFill8() {
+  const a = document.getElementById('fill8a').value.trim();
+  const b = document.getElementById('fill8b').value.trim();
+  const aok = a.toLowerCase().includes('chmod');
+  const bok = b.toLowerCase().includes('chown');
+  const all = aok && bok;
+  showFeedback('q8-fb', all, all ? 'Saktë! chmod dhe chown janë komandat e duhura!' : `Jo saktë. Komandat janë: chmod dhe chown`);
+  markAnswered('q8', all, `chmod:"${a}", chown:"${b}"` + (!all ? ' → (E saktë: chmod, chown)' : ''));
+}
+
+// ===================== DRAG & DROP =====================
+let draggedChip = null;
+function dragStart(e) {
+  draggedChip = e.target;
+  e.target.classList.add('dragging');
+  e.dataTransfer.setData('text', e.target.dataset.val);
+}
+
+function dropChip(e, dropId) {
+  e.preventDefault();
+  const drop = document.getElementById(dropId);
+  drop.classList.remove('over');
+  if (draggedChip) {
+    draggedChip.classList.remove('dragging');
+    // Clone chip into drop zone
+    const clone = draggedChip.cloneNode(true);
+    clone.draggable = false;
+    clone.classList.add('placed');
+    clone.style.cursor = 'default';
+    drop.innerHTML = '';
+    drop.appendChild(clone);
+    drop.dataset.val = draggedChip.dataset.val;
+    draggedChip.style.opacity = '0.4';
+    draggedChip.draggable = false;
+    draggedChip.classList.add('placed');
+    draggedChip = null;
+  }
+}
+
+function checkDD9() {
+  const n = document.getElementById('drop-nxenes').dataset.val;
+  const p = document.getElementById('drop-prof').dataset.val;
+  const a = document.getElementById('drop-admin').dataset.val;
+  const ok = n === 'lexim' && p === 'lexim-shkrim' && a === 'kontroll-plot';
+  const lbl = { lexim:'Vetëm Lexim', 'lexim-shkrim':'Lexim dhe Shkrim', 'kontroll-plot':'Kontroll i Plotë' };
+  showFeedback('q9-fb', ok, ok ? 'Saktë! Rolet janë vendosur drejt!' : 'Jo saktë. Nxënësi→Vetëm Lexim, Profesori→Lexim dhe Shkrim, Administratori→Kontroll i Plotë');
+  markAnswered('q9', ok, `Nxënësi:"${lbl[n]||n||'?'}", Profesori:"${lbl[p]||p||'?'}", Administratori:"${lbl[a]||a||'?'}"`);
+}
+
+function checkDD10() {
+  const w = document.getElementById('drop-win').dataset.val;
+  const l = document.getElementById('drop-linux').dataset.val;
+  const c = document.getElementById('drop-cloud').dataset.val;
+  const ok = w === 'ad' && l === 'chmod' && c === 'aws';
+  const lbl = { ad:'Active Directory', chmod:'chmod/chown', aws:'AWS IAM' };
+  showFeedback('q10-fb', ok, ok ? 'Saktë! Mjetet janë vendosur drejt!' : 'Jo saktë. Windows→Active Directory, Linux→chmod/chown, Cloud→AWS IAM');
+  markAnswered('q10', ok, `Windows:"${lbl[w]||w||'?'}", Linux:"${lbl[l]||l||'?'}", Cloud:"${lbl[c]||c||'?'}"`);
+}
+
+// ===================== MATCH =====================
+function checkMatch11() {
+  const a = document.getElementById('match11a').value;
+  const b = document.getElementById('match11b').value;
+  const c = document.getElementById('match11c').value;
+  const d = document.getElementById('match11d').value;
+  const ok = a === 'hap' && b === 'ndry' && c === 'ekz' && d === 'plot';
+  const opts = { hap:'Hapje pa modifikim', ndry:'Ndryshim/krijim', ekz:'Ekzekutim', plot:'Kontroll total', '':'(pa zgjedhje)' };
+  showFeedback('q11-fb', ok, ok ? 'Saktë! Të gjitha çiftet janë të sakta!' : 'Jo plotësisht: Read→Hapje, Write→Ndryshim, Execute→Ekzekutim, Full Control→Kontroll total');
+  markAnswered('q11', ok, `Read→"${opts[a]||a}", Write→"${opts[b]||b}", Execute→"${opts[c]||c}", Full Control→"${opts[d]||d}"`);
+}
+
+// ===================== ORDER =====================
+let orderDragSrc = null;
+function orderDragStart(e, qid) {
+  orderDragSrc = e.currentTarget;
+  e.currentTarget.classList.add('dragging-order');
+}
+function orderDragOver(e) { e.preventDefault(); }
+function orderDrop(e, qid) {
+  e.preventDefault();
+  if (orderDragSrc === e.currentTarget) return;
+  const src = orderDragSrc;
+  const tgt = e.currentTarget;
+  if (!src || !tgt) return;
+  const list = document.getElementById('orderList14');
+  const items = [...list.querySelectorAll('.order-item')];
+  const si = items.indexOf(src); const ti = items.indexOf(tgt);
+  if (si < ti) list.insertBefore(src, tgt.nextSibling);
+  else list.insertBefore(src, tgt);
+  items.forEach(item => item.classList.remove('dragging-order'));
+  updateOrderNums(qid);
+}
+function updateOrderNums(qid) {
+  const list = document.getElementById('orderList' + qid);
+  const items = [...list.querySelectorAll('.order-item')];
+  items.forEach((item, i) => {
+    const num = item.querySelector('.order-num');
+    if (num) num.textContent = i + 1;
+  });
+}
+function checkOrder14() {
+  const list = document.getElementById('orderList14');
+  const items = [...list.querySelectorAll('.order-item')];
+  const steps = items.map(i => parseInt(i.dataset.step));
+  const labels = items.map(i => i.querySelector('span').textContent.trim());
+  const ok = steps[0] === 1 && steps[1] === 2 && steps[2] === 3;
+  showFeedback('q14-fb', ok, ok ? 'Saktë! Hapat janë në rendin e duhur!' : 'Jo saktë. Rendi: 1) Klikimi djathtë→Properties, 2) Security tab, 3) Zgjidh përdoruesin→Edit');
+  markAnswered('q14', ok, labels.map((l,i)=>`${i+1}. ${l}`).join(' | '));
+}
+
+// ===================== WORD SEARCH =====================
+const gridData = [
+  ['R','E','A','D','P','Q','Z','M','N','O'],
+  ['B','A','D','M','I','N','X','Y','L','K'],
+  ['W','R','I','T','E','F','G','H','I','J'],
+  ['R','B','A','C','U','V','W','X','Y','Z'],
+  ['R','O','L','E','S','T','U','V','W','X'],
+  ['A','B','C','D','E','F','G','H','I','J'],
+  ['K','L','M','N','O','P','Q','R','S','T'],
+  ['U','V','W','X','Y','Z','A','B','C','D'],
+];
+
+const wordPositions = {
+  'READ':  [{r:0,c:0},{r:0,c:1},{r:0,c:2},{r:0,c:3}],
+  'ADMIN': [{r:1,c:1},{r:1,c:2},{r:1,c:3},{r:1,c:4},{r:1,c:5}],
+  'WRITE': [{r:2,c:0},{r:2,c:1},{r:2,c:2},{r:2,c:3},{r:2,c:4}],
+  'RBAC':  [{r:3,c:0},{r:3,c:1},{r:3,c:2},{r:3,c:3}],
+  'ROLE':  [{r:4,c:0},{r:4,c:1},{r:4,c:2},{r:4,c:3}],
+};
+
+let selectedCells = [];
+let foundWords = new Set();
+
+function buildGrid() {
+  const grid = document.getElementById('wordGrid');
+  gridData.forEach((row, r) => {
+    row.forEach((letter, c) => {
+      const cell = document.createElement('div');
+      cell.className = 'wg-cell';
+      cell.textContent = letter;
+      cell.dataset.r = r; cell.dataset.c = c;
+      cell.addEventListener('click', () => selectCell(cell, r, c));
+      grid.appendChild(cell);
+    });
+  });
+}
+
+function selectCell(cell, r, c) {
+  if (cell.classList.contains('found')) return;
+  if (cell.classList.contains('selected')) {
+    cell.classList.remove('selected');
+    selectedCells = selectedCells.filter(s => !(s.r == r && s.c == c));
+  } else {
+    cell.classList.add('selected');
+    selectedCells.push({r, c, el: cell});
+  }
+  checkWordFound();
+}
+
+function checkWordFound() {
+  for (const [word, positions] of Object.entries(wordPositions)) {
+    if (foundWords.has(word)) continue;
+    const allSel = positions.every(p => selectedCells.some(s => s.r == p.r && s.c == p.c));
+    if (allSel && selectedCells.length === positions.length) {
+      foundWords.add(word);
+      positions.forEach(p => {
+        const cell = document.querySelector(`.wg-cell[data-r="${p.r}"][data-c="${p.c}"]`);
+        if (cell) { cell.classList.remove('selected'); cell.classList.add('found'); }
+      });
+      selectedCells = [];
+      document.querySelector(`.word-to-find[data-word="${word}"]`).classList.add('found-word');
+      if (foundWords.size === 5) {
+        showFeedback('q15-fb', true, 'Bravo! Keni gjetur të gjitha 5 fjalët!');
+        markAnswered('q15', true, 'Gjeti të gjitha 5 fjalët: READ, ADMIN, WRITE, RBAC, ROLE');
+      } else {
+        markAnswered('q15', false, `Gjeti ${foundWords.size}/5: ${[...foundWords].join(', ')}`);
+      }
+    }
+  }
+  // clear if too many selected
+  if (selectedCells.length > 5) {
+    selectedCells.forEach(s => s.el.classList.remove('selected'));
+    selectedCells = [];
+  }
+}
+
+buildGrid();
+
+// ===================== CANVAS =====================
+const canvas = document.getElementById('drawCanvas');
+const ctx = canvas.getContext('2d');
+let drawing = false;
+let currentColor = '#1a56db';
+let history = [];
+
+function saveHistory() {
+  history.push(ctx.getImageData(0, 0, canvas.width, canvas.height));
+  if (history.length > 30) history.shift();
+}
+
+canvas.addEventListener('mousedown', e => { drawing = true; saveHistory(); ctx.beginPath(); ctx.moveTo(e.offsetX, e.offsetY); });
+canvas.addEventListener('mousemove', e => {
+  if (!drawing) return;
+  ctx.lineWidth = document.getElementById('brushSize').value;
+  ctx.lineCap = 'round';
+  ctx.strokeStyle = currentColor;
+  ctx.lineTo(e.offsetX, e.offsetY);
+  ctx.stroke();
+});
+canvas.addEventListener('mouseup', () => { drawing = false; markAnswered('q16', null, 'Diagram i vizatuar'); });
+canvas.addEventListener('mouseleave', () => { drawing = false; });
+
+// Touch
+canvas.addEventListener('touchstart', e => {
+  e.preventDefault();
+  const t = e.touches[0];
+  const r = canvas.getBoundingClientRect();
+  drawing = true; saveHistory();
+  ctx.beginPath(); ctx.moveTo(t.clientX - r.left, t.clientY - r.top);
+});
+canvas.addEventListener('touchmove', e => {
+  e.preventDefault();
+  if (!drawing) return;
+  const t = e.touches[0];
+  const r = canvas.getBoundingClientRect();
+  ctx.lineWidth = document.getElementById('brushSize').value;
+  ctx.lineCap = 'round'; ctx.strokeStyle = currentColor;
+  ctx.lineTo(t.clientX - r.left, t.clientY - r.top);
+  ctx.stroke();
+});
+canvas.addEventListener('touchend', () => { drawing = false; markAnswered('q16', null, 'Diagram i vizatuar'); });
+
+function setColor(dot) {
+  document.querySelectorAll('.color-dot').forEach(d => d.classList.remove('active'));
+  dot.classList.add('active');
+  currentColor = dot.dataset.c;
+}
+
+function clearCanvas() {
+  saveHistory();
+  ctx.clearRect(0, 0, canvas.width, canvas.height);
+}
+
+function undoDraw() {
+  if (history.length > 0) ctx.putImageData(history.pop(), 0, 0);
+}
+
+// Draw placeholder text on canvas
+ctx.fillStyle = '#e5e7eb';
+ctx.fillRect(0, 0, canvas.width, canvas.height);
+ctx.fillStyle = '#9ca3af';
+ctx.font = '14px Segoe UI';
+ctx.textAlign = 'center';
+ctx.fillText('Vizatoni diagramin tuaj këtu... (klikoni dhe tërhiqni)', canvas.width/2, canvas.height/2);
+ctx.textAlign = 'left';
+
+// ===================== SUBMIT =====================
+function submitExercise() {
+  const emri = document.getElementById('emri').value.trim();
+  const mbiemri = document.getElementById('mbiemri').value.trim();
+  const klasa = document.getElementById('klasa').value.trim();
+  if (!emri || !mbiemri || !klasa) {
+    alert('Ju lutem plotësoni emrin, mbiemrin dhe klasën tuaj!');
+    return;
+  }
+  // Force-capture open answers
+  ['q12','q13'].forEach(id => {
+    const el = document.getElementById(id);
+    if (el && el.value.trim().length > 0) markOpen(id, el.value.trim());
+  });
+
+  const correctCount = Object.values(answered).filter(v => v.correct === true).length;
+  const wrongCount   = Object.values(answered).filter(v => v.correct === false).length;
+  const openCount    = Object.values(answered).filter(v => v.correct === null).length;
+  const autoTotal    = autoQids.length;
+  const pct          = Math.round(correctCount / autoTotal * 100);
+
+  document.getElementById('preSubmit').style.display = 'none';
+  document.getElementById('postSubmit').style.display = 'block';
+  document.getElementById('studentNameDisplay').textContent = `${emri} ${mbiemri} — Klasa: ${klasa}`;
+  document.getElementById('scoreDisplay').textContent = correctCount + ' / ' + autoTotal;
+  document.getElementById('scorePct').textContent = pct + '%';
+  document.getElementById('scoreWrong').textContent = wrongCount;
+  document.getElementById('scoreOpen').textContent = openCount;
+
+  // Build inline summary table
+  buildSummaryTable();
+}
+
+const qMeta = {
+  q1:  { label:'Çfarë është aksesi?',               type:'Zgjedhje e shumëfishtë' },
+  q2:  { label:'E drejta Read',                      type:'Zgjedhje e shumëfishtë' },
+  q3:  { label:'Least Privilege',                    type:'Zgjedhje e shumëfishtë' },
+  q4:  { label:'Nxënësi modifikon notat',            type:'E Saktë/E Gabuar' },
+  q5:  { label:'RBAC kuptohet si...',                type:'E Saktë/E Gabuar' },
+  q6:  { label:'Administratori - akses i kufizuar',  type:'E Saktë/E Gabuar' },
+  q7:  { label:'Plotëso: Read/Write/Full Control',   type:'Plotëso boshllëqet' },
+  q8:  { label:'Plotëso: chmod/chown',               type:'Plotëso boshllëqet' },
+  q9:  { label:'Drag & Drop: Rolet',                 type:'Drag & Drop' },
+  q10: { label:'Drag & Drop: Mjetet',                type:'Drag & Drop' },
+  q11: { label:'Bashko çiftet (të drejtat)',         type:'Bashko çiftet' },
+  q12: { label:'Pse është i rëndësishëm menaxhimi?', type:'Pyetje e hapur' },
+  q13: { label:'Gabimet e shpeshta',                 type:'Pyetje e hapur' },
+  q14: { label:'Rendit hapat Windows',               type:'Rendit hapat' },
+  q15: { label:'Gjej fjalën',                        type:'Fjalë të fshehura' },
+  q16: { label:'Vizato diagramin',                   type:'Vizatim' },
+};
+
+function buildSummaryTable() {
+  const wrap = document.getElementById('summaryTable');
+  let rows = '';
+  for (let i = 1; i <= 16; i++) {
+    const qid = 'q' + i;
+    const meta = qMeta[qid] || { label: 'Pyetja '+i, type:'' };
+    const data = answered[qid];
+    let status, statusClass, answerHtml;
+    if (!data) {
+      status = '— Pa u plotësuar'; statusClass = 'sum-skip'; answerHtml = '<em style="color:#9ca3af">Pa përgjigje</em>';
+    } else if (data.correct === null) {
+      status = '📝 Vlerësohet nga mësuesi'; statusClass = 'sum-open';
+      answerHtml = `<div class="sum-answer">${escHtml(data.answer || '')}</div>`;
+    } else if (data.correct) {
+      status = '✅ Saktë'; statusClass = 'sum-ok';
+      answerHtml = `<div class="sum-answer ok-ans">${escHtml(data.answer || '')}</div>`;
+    } else {
+      status = '❌ Gabim'; statusClass = 'sum-ng';
+      answerHtml = `<div class="sum-answer ng-ans">${escHtml(data.answer || '')}</div>`;
+    }
+    rows += `<tr>
+      <td class="sum-num">${i}</td>
+      <td><strong>${escHtml(meta.label)}</strong><br><span class="sum-type">${escHtml(meta.type)}</span></td>
+      <td><span class="${statusClass}">${status}</span></td>
+      <td>${answerHtml}</td>
+    </tr>`;
+  }
+  wrap.innerHTML = rows;
+}
+
+function escHtml(s) {
+  return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+}
+
+// ===================== DOWNLOAD EXERCISE FILE =====================
+function downloadExerciseFile() {
+  const html = document.documentElement.outerHTML;
+  const encoded = 'data:text/html;charset=utf-8,' + encodeURIComponent(html);
+  const a = document.createElement('a');
+  a.setAttribute('href', encoded);
+  a.setAttribute('download', 'ushtrim_menaxhimi_akseseve.html');
+  document.body.appendChild(a);
+  a.click();
+  document.body.removeChild(a);
+}
+
+// ===================== DOWNLOAD =====================
+function downloadResults() {
+  const emri    = document.getElementById('emri').value.trim();
+  const mbiemri = document.getElementById('mbiemri').value.trim();
+  const klasa   = document.getElementById('klasa').value.trim();
+  let drawImg = '';
+  try { drawImg = canvas.toDataURL('image/png'); } catch(e) { drawImg = ''; }
+
+  const correctCount = Object.values(answered).filter(v => v.correct === true).length;
+  const wrongCount   = Object.values(answered).filter(v => v.correct === false).length;
+  const openCount    = Object.values(answered).filter(v => v.correct === null).length;
+  const autoTotal    = autoQids.length;
+  const pct          = Math.round(correctCount / autoTotal * 100);
+
+  // Build question rows for download
+  let dlRows = '';
+  for (let i = 1; i <= 16; i++) {
+    const qid  = 'q' + i;
+    const meta = qMeta[qid] || { label:'Pyetja '+i, type:'' };
+    const data = answered[qid];
+    let badge, ansHtml;
+    if (!data) {
+      badge = '<span style="color:#9ca3af;font-weight:700">— Pa u plotësuar</span>';
+      ansHtml = '<em>Pa përgjigje</em>';
+    } else if (data.correct === null) {
+      badge = '<span style="color:#6c2bd9;font-weight:700">📝 Vlerësohet nga mësuesi</span>';
+      ansHtml = `<div style="white-space:pre-wrap;color:#374151">${escHtml(data.answer||'')}</div>`;
+    } else if (data.correct) {
+      badge = '<span style="color:#057a55;font-weight:700;font-size:1.05em">✅ SAKTË</span>';
+      ansHtml = `<div style="color:#057a55">${escHtml(data.answer||'')}</div>`;
+    } else {
+      badge = '<span style="color:#c81e1e;font-weight:700;font-size:1.05em">❌ GABIM</span>';
+      ansHtml = `<div style="color:#c81e1e">${escHtml(data.answer||'')}</div>`;
+    }
+    dlRows += `<tr style="border-bottom:1px solid #e5e7eb">
+      <td style="padding:10px 8px;font-weight:700;color:#1a56db;text-align:center;vertical-align:top">${i}</td>
+      <td style="padding:10px 8px;vertical-align:top"><strong>${escHtml(meta.label)}</strong><br><small style="color:#9ca3af">${escHtml(meta.type)}</small></td>
+      <td style="padding:10px 8px;vertical-align:top">${badge}</td>
+      <td style="padding:10px 8px;vertical-align:top;font-size:0.9em">${ansHtml}</td>
+    </tr>`;
+  }
+
+  // emoji for score
+  const emoji = pct >= 80 ? '🏆' : pct >= 60 ? '👍' : '📚';
+
+  const html = `<!DOCTYPE html>
+<html lang="sq">
+<head>
+<meta charset="UTF-8">
+<title>Rezultatet — ${escHtml(emri)} ${escHtml(mbiemri)}</title>
+<style>
+  * { box-sizing:border-box; margin:0; padding:0; }
+  body { font-family:'Segoe UI',Arial,sans-serif; background:#f3f4f6; padding:30px 16px; color:#374151; }
+  .page { max-width:760px; margin:0 auto; background:white; border-radius:16px; overflow:hidden; box-shadow:0 4px 24px rgba(0,0,0,0.10); }
+  .top-bar { background:linear-gradient(135deg,#1e3a8a,#1a56db); padding:28px 32px; color:white; }
+  .top-bar h1 { font-size:1.35rem; margin-bottom:4px; }
+  .top-bar p { opacity:.85; font-size:0.92rem; }
+  .info-grid { display:grid; grid-template-columns:1fr 1fr; gap:0; border-bottom:2px solid #e5e7eb; }
+  .info-cell { padding:16px 24px; border-right:1px solid #e5e7eb; }
+  .info-cell:last-child { border-right:none; }
+  .info-cell label { font-size:0.75rem; font-weight:700; text-transform:uppercase; letter-spacing:.5px; color:#9ca3af; display:block; margin-bottom:4px; }
+  .info-cell span { font-size:1rem; font-weight:700; color:#374151; }
+  .score-strip { display:flex; gap:0; border-bottom:2px solid #e5e7eb; flex-wrap:wrap; }
+  .score-box { flex:1; min-width:100px; padding:18px 12px; text-align:center; border-right:1px solid #e5e7eb; }
+  .score-box:last-child { border-right:none; }
+  .score-box .val { font-size:2rem; font-weight:800; line-height:1; }
+  .score-box .lbl { font-size:0.75rem; color:#9ca3af; margin-top:4px; font-weight:600; text-transform:uppercase; }
+  .val-green { color:#057a55; } .val-red { color:#c81e1e; } .val-blue { color:#1a56db; } .val-purple { color:#6c2bd9; } .val-orange { color:#d97706; }
+  .section-head { padding:14px 24px; background:#f9fafb; border-bottom:1px solid #e5e7eb; font-weight:700; color:#374151; font-size:0.95rem; letter-spacing:.2px; }
+  table { width:100%; border-collapse:collapse; }
+  th { padding:10px 8px; background:#f3f4f6; font-size:0.8rem; color:#6b7280; font-weight:700; text-align:left; text-transform:uppercase; letter-spacing:.4px; border-bottom:2px solid #e5e7eb; }
+  .draw-section { padding:24px; border-top:2px solid #e5e7eb; }
+  .draw-section h3 { margin-bottom:12px; color:#374151; }
+  .draw-section img { max-width:100%; border:1px solid #e5e7eb; border-radius:8px; }
+  .footer { text-align:center; padding:20px; color:#9ca3af; font-size:0.8rem; border-top:1px solid #e5e7eb; }
+  @media print { body { padding:0; } .page { box-shadow:none; border-radius:0; } }
+</style>
+</head>
+<body>
+<div class="page">
+  <div class="top-bar">
+    <h1>🔐 Menaxhimi i Akseseve dhe të Drejtave në Sisteme</h1>
+    <p>Rezultatet e plotë të ushtrimit</p>
+  </div>
+
+  <div class="info-grid">
+    <div class="info-cell"><label>Nxënësi</label><span>${escHtml(emri)} ${escHtml(mbiemri)}</span></div>
+    <div class="info-cell"><label>Klasa</label><span>${escHtml(klasa)}</span></div>
+    <div class="info-cell"><label>Data e dorëzimit</label><span>${new Date().toLocaleDateString('sq-AL',{weekday:'long',year:'numeric',month:'long',day:'numeric'})}</span></div>
+    <div class="info-cell"><label>Ora</label><span>${new Date().toLocaleTimeString('sq-AL',{hour:'2-digit',minute:'2-digit'})}</span></div>
+  </div>
+
+  <div class="score-strip">
+    <div class="score-box"><div class="val val-blue">${emoji} ${pct}%</div><div class="lbl">Rezultati</div></div>
+    <div class="score-box"><div class="val val-green">${correctCount}</div><div class="lbl">✅ Saktë</div></div>
+    <div class="score-box"><div class="val val-red">${wrongCount}</div><div class="lbl">❌ Gabim</div></div>
+    <div class="score-box"><div class="val val-purple">${openCount}</div><div class="lbl">📝 Të hapura</div></div>
+    <div class="score-box"><div class="val val-orange">${autoTotal - correctCount - wrongCount}</div><div class="lbl">— Pa u plotësuar</div></div>
+  </div>
+
+  <div class="section-head">📋 Të gjitha përgjigjet — Pyetje 1–16</div>
+  <table>
+    <thead><tr>
+      <th style="width:40px">#</th>
+      <th>Pyetja</th>
+      <th style="width:160px">Rezultati</th>
+      <th>Përgjigja e dhënë</th>
+    </tr></thead>
+    <tbody>${dlRows}</tbody>
+  </table>
+
+  <div class="draw-section">
+    <h3>🎨 Pyetja 16 — Diagram i vizatuar</h3>
+    <img src="${drawImg}" alt="Diagrami i nxënësit">
+  </div>
+
+  <div class="footer">
+    Ushtrim: Menaxhimi i Akseseve dhe të Drejtave në Sisteme &nbsp;•&nbsp; ${new Date().getFullYear()}
+    <br>Ky dokument përmban të gjitha përgjigjet e nxënësit dhe vlerësohet nga mësuesi/ja.
+  </div>
+</div>
+</body>
+</html>`;
+
+  const encoded = 'data:text/html;charset=utf-8,' + encodeURIComponent(html);
+  const a = document.createElement('a');
+  a.setAttribute('href', encoded);
+  a.setAttribute('download', `ushtrim_${emri}_${mbiemri}_${klasa}.html`);
+  document.body.appendChild(a);
+  a.click();
+  document.body.removeChild(a);
+}
+
+// Init order nums
+updateOrderNums(14);
+updateProgress();
+</script>
+
+
+</body></html>

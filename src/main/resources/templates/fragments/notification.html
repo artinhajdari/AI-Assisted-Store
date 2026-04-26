@@ -1,0 +1,11 @@
+<!DOCTYPE html>
+<html lang="en">
+<body>
+<div th:fragment="notification">
+    <div th:if="${operationResult}"  class="alert alert-dismissible text-center fade show" role="alert" th:classappend="${operationResult.getValid()} ? 'alert-success' : 'alert-danger'">
+        <span th:text="${operationResult.getMessage()}"></span>
+        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+    </div>
+</div>
+</body>
+</html>
