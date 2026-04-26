@@ -137,4 +137,4 @@ If you need admin access locally, make sure you have at least one user with `ADM
 
 ## Screenshots
 ![ScreenShot](./screenshots/index.png)
-![ScreenShot](./Screenshots/edit-product.png)
+![ScreenShot](./screenshots/edit-product.png)
