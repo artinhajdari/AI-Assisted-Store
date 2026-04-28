@@ -53,7 +53,7 @@ public class ChatGenServiceImpl implements ChatGenService {
         }
         List<Long> generatedItemIDs = searchSummary.getHighlightedFeatureIDs();
         if (Objects.isNull(generatedItemIDs) || generatedItemIDs.isEmpty()) {
-            return elements;
+            return Collections.emptyList();
         }
         return elements.stream().filter(element -> generatedItemIDs.contains(element.getId())).collect(Collectors.toList());
     }
