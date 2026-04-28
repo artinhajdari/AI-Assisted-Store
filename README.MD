@@ -7,6 +7,9 @@ A demo store application using RAG built with Spring Boot, Thymeleaf, and Spring
 This project showcases the helpful AI usage in product searching through RAG.
 It is intended as a learning and reference project for combining classic Spring MVC architecture with AI-assisted search.
 
+## Demo usage
+![Description](./demo/site-demo.gif)
+
 ## Core Features
 
 - Layered architecture with Spring Boot and Spring MVC
@@ -134,7 +137,3 @@ If you need admin access locally, make sure you have at least one user with `ADM
 - Add observability (structured logs, metrics, tracing)
 - Add caching for frequent search queries
 - Improve security hardening (CSRF review, stricter headers, brute-force protection)
-
-## Screenshots
-![ScreenShot](./screenshots/index.png)
-![ScreenShot](./screenshots/edit-product.png)
