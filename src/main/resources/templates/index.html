@@ -4,17 +4,20 @@
     <title th:text="#{store.AIAssistedStore}"></title>
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <th:block th:replace="~{fragments/common-scripts-styles :: common-scripts-styles}"></th:block>
-    <script type="module" th:src="@{/js/store.js}"></script>
     <script>
         const storeData = {
-            currency: '[[#{store.Currency}]]'
+            currency: '[[#{store.Currency}]]',
+            seeMore: '[[#{store.SeeMore}]]',
+            imgPath: '[[@{/img}]]',
+            productImage: '[[#{store.ProductImage}]]'
         }
     </script>
+    <script type="module" th:src="@{/js/store.js}"></script>
 </head>
 <body class="bg-light">
 <nav class="navbar navbar-expand-lg navbar-light bg-white shadow-sm mb-5">
     <div class="container">
-        <a th:text="#{store.DemoAI}" class="navbar-brand fw-bold" th:href="@{/}"><span th:text="#{store.Store}" class="text-primary"></span></a>
+        <a th:text="#{store.AIAssistedStore}" class="navbar-brand fw-bold" th:href="@{/}"></a>
 
         <div class="d-flex align-items-center gap-3">
             <span sec:authorize="hasAuthority('ADMIN')">

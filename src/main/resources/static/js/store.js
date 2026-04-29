@@ -9,6 +9,13 @@ let currentlyDisplayedProducts = [];
 window.onload = function () {
     toggleProductSpinner(true);
     searchProducts('');
+    document.addEventListener('error', function (e) {
+        const img = e.target;
+        if (img.tagName === 'IMG' && img.classList.contains('product-img')) {
+            img.src = `${storeData.imgPath}/fallback.svg`;
+            img.onerror = null; // prevent infinite loop
+        }
+    }, true);
     let searchButton = document.getElementById('searchButton');
     searchButton.addEventListener('click', function() {
         let query = document.getElementById('query')?.value;
@@ -22,6 +29,7 @@ window.onload = function () {
        toggleLoadMoreProductsSpinner(true);
        searchProducts('');
     });
+
 }
 
 function searchProducts(query) {
@@ -91,9 +99,8 @@ function getProductPlaceholderHTML() {
         className: 'card h-100 shadow-sm border-0'
     });
     let imgDiv = Object.assign(document.createElement('div'), {
-        className: 'bg-secondary bg-opacity-10 d-flex align-items-center justify-content-center text-muted',
+        className: 'product-img-wrapper bg-secondary bg-opacity-10 d-flex align-items-center justify-content-center text-muted',
         style: 'height: 200px;',
-        textContent: 'No Image'
     });
     let descriptionDiv = Object.assign(document.createElement('div'), {
         className: 'card-body d-flex flex-column',
@@ -107,9 +114,13 @@ function getProductPlaceholderHTML() {
 
 function populatePlaceholderHTML(placeholder, product) {
     let descriptionDiv = placeholder.querySelector('#descriptionDiv');
-    Object.assign(descriptionDiv.dataset, {
-        productId: product.id
+    let imgDiv = placeholder.querySelector('.product-img-wrapper');
+    let productImg = Object.assign(document.createElement('img'), {
+        src: product.imageUrl,
+        className: 'img-fluid w-100 h-100 product-img',
+        alt: storeData.productImage,
     });
+    imgDiv.append(productImg);
     let productName = Object.assign(document.createElement('h5'), {
         className: 'card-title text-truncate',
         textContent: product.name
@@ -149,7 +160,7 @@ function hideAllSpinners() {
 function displayToggleDescriptionElement(descriptionDiv, product) {
     let toggleDescriptionElement = Object.assign(document.createElement('a'), {
         className: 'text-decoration-none toggle-description mb-3',
-        textContent: 'See More',
+        textContent: storeData.seeMore,
         role: 'button'
     });
     Object.assign(toggleDescriptionElement.dataset, {

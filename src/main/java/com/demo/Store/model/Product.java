@@ -24,6 +24,9 @@ public class Product {
     @Column(nullable = false)
     private Integer quantity;
 
+    @Column(length = 2048)
+    private String imageUrl;
+
     public Long getId() {
         return id;
     }
@@ -70,5 +73,13 @@ public class Product {
 
     public void setQuantity(Integer quantity) {
         this.quantity = quantity;
+    }
+
+    public String getImageUrl() {
+        return imageUrl;
+    }
+
+    public void setImageUrl(String imageUrl) {
+        this.imageUrl = imageUrl;
     }
 }

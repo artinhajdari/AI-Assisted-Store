@@ -2,6 +2,7 @@ package com.demo.Store.model.dto;
 
 import com.demo.Store.model.dto.ai.AISearchable;
 import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotNull;
 import org.apache.commons.lang3.builder.EqualsBuilder;
 import org.apache.commons.lang3.builder.HashCodeBuilder;
 
@@ -14,10 +15,11 @@ public class ProductDto implements AISearchable {
     private String aiDescription;
     @NotBlank(message = "{admin.products.SimpleDescriptionRequired}")
     private String displayedDescription;
-    @NotBlank(message = "{admin.products.PriceRequired}")
+    @NotNull(message = "{admin.products.PriceRequired}")
     private Double price;
-    @NotBlank(message = "{admin.products.QuantityRequired}")
+    @NotNull(message = "{admin.products.QuantityRequired}")
     private Integer quantity;
+    private String imageUrl;
 
     @Override
     public Long getId() {
@@ -66,6 +68,14 @@ public class ProductDto implements AISearchable {
 
     public void setQuantity(Integer quantity) {
         this.quantity = quantity;
+    }
+
+    public String getImageUrl() {
+        return imageUrl;
+    }
+
+    public void setImageUrl(String imageUrl) {
+        this.imageUrl = imageUrl;
     }
 
     @Override

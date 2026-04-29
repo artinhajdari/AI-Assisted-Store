@@ -75,6 +75,13 @@
                     <span th:text="#{admin.products.DisplayedDescriptionMaxCharCount}" id="charCount"></span> <span th:text="#{admin.products.DisplayedDescriptionRemainingChars}"></span>
                 </div>
             </div>
+            <div class="mb-4">
+                <label th:text="#{admin.products.ProductImgUrl}" for="imageUrl"
+                       class="form-label text-muted small fw-bold"></label>
+                <input type="text" id="imageUrl" th:field="*{imageUrl}" class="form-control form-control-lg"
+                       required
+                       th:placeholder="#{admin.products.ProductImgUrlPlaceholder}">
+            </div>
             <div class="d-grid mt-2">
                 <button th:text="#{admin.products.SaveProduct}" type="submit" class="btn btn-primary btn-lg"></button>
             </div>

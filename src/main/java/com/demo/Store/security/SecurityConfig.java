@@ -25,7 +25,7 @@ public class SecurityConfig {
                 .authorizeHttpRequests(auth -> auth
                         .requestMatchers("/admin/**").hasAuthority(UserRole.ADMIN.name())
                         .requestMatchers("/checkout").hasAnyAuthority(UserRole.USER.name(), UserRole.ADMIN.name())
-                        .requestMatchers("/", "/login/**", "/search", "/css/**", "/js/**", "/register").permitAll()
+                        .requestMatchers("/", "/login/**", "/search", "/css/**", "/js/**", "/img/**","/register").permitAll()
                         .anyRequest().authenticated()
                 )
                 .formLogin(form -> form
