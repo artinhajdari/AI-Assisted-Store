@@ -1,6 +1,7 @@
 package com.demo.Store.service.impl;
 
 import com.demo.Store.model.dto.ProductDto;
+import com.demo.Store.model.dto.ai.SearchSummary;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -13,9 +14,9 @@ import org.springframework.ai.chat.model.ChatModel;
 import org.springframework.ai.chat.prompt.Prompt;
 
 import java.util.List;
+import java.util.Optional;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertSame;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
@@ -47,20 +48,20 @@ class ChatGenServiceImplTest {
 
     @Test
     void filterElementsReturnsOriginalListWhenPromptIsBlank() throws Exception {
-        List<ProductDto> result = service.filterElements(" ", productDtos);
+        List<Long> result = unwrapModelResponse(service.searchElements(" ", productDtos));
 
         assertEquals(2, result.size());
         verifyNoInteractions(chatModel);
     }
 
     @Test
-    void filterElementsReturnsOriginalListWhenModelResponseIsNull() throws Exception {
+    void filterElementsReturnsEmptyListWhenModelResponseIsNull() throws Exception {
         when(chatModel.call(any(Prompt.class)).getResult().getOutput().getText()).thenReturn(null);
         when(objectMapper.writeValueAsString(any())).thenReturn("");
 
-        List<ProductDto> result = service.filterElements("laptop", productDtos);
+        SearchSummary result = service.searchElements("laptop", productDtos);
 
-        assertSame(productDtos, result);
+        assertEquals(SearchSummary.empty(), result);
         verify(chatModel).call(any(Prompt.class));
     }
 
@@ -70,17 +71,21 @@ class ChatGenServiceImplTest {
                 .thenReturn("{\"highlightedFeatureIDs\":[2]}");
         when(objectMapper.writeValueAsString(any())).thenReturn("");
 
-        List<ProductDto> result = service.filterElements("show me second", productDtos);
+        List<Long> result = unwrapModelResponse(service.searchElements("show me second", productDtos));
 
         assertEquals(1, result.size());
-        assertEquals(2L, result.getFirst().getId());
+        assertEquals(2L, result.getFirst());
     }
 
     @Test
     void filterElementsReturnsEmptyWhenElementsAreMissing() throws Exception {
-        List<ProductDto> result = service.filterElements("query", List.of());
+        List<Long> result = unwrapModelResponse(service.searchElements("query", List.of()));
 
         assertEquals(0, result.size());
         verify(chatModel, never()).call(any(Prompt.class));
+    }
+
+    private List<Long> unwrapModelResponse(SearchSummary response) {
+        return Optional.ofNullable(response).map(SearchSummary::getHighlightedFeatureIDs).orElse(List.of());
     }
 }

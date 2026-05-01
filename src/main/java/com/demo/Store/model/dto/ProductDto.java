@@ -1,11 +1,13 @@
 package com.demo.Store.model.dto;
 
 import com.demo.Store.model.dto.ai.AISearchable;
+import com.fasterxml.jackson.annotation.JsonInclude;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import org.apache.commons.lang3.builder.EqualsBuilder;
 import org.apache.commons.lang3.builder.HashCodeBuilder;
 
+@JsonInclude(JsonInclude.Include.NON_NULL)
 public class ProductDto implements AISearchable {
 
     private Long id;

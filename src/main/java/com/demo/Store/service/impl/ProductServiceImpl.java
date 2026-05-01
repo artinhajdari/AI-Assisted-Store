@@ -2,7 +2,10 @@ package com.demo.Store.service.impl;
 
 import com.demo.Store.model.Product;
 import com.demo.Store.model.dto.OperationResultDto;
+import com.demo.Store.model.dto.ai.SearchSummary;
+import com.demo.Store.model.dto.mapper.ProductMapper;
 import com.demo.Store.repository.ProductRepository;
+import com.demo.Store.service.ChatGenService;
 import com.demo.Store.service.MessageSourceService;
 import com.demo.Store.service.ProductService;
 import com.demo.Store.util.StoreConstants;
@@ -16,10 +19,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.thymeleaf.util.Validate;
 
-import java.util.List;
-import java.util.Map;
-import java.util.Objects;
-import java.util.UUID;
+import java.util.*;
 import java.util.stream.Collectors;
 
 @Service
@@ -27,14 +27,19 @@ public class ProductServiceImpl implements ProductService {
 
     private final ProductRepository productRepository;
     private final VectorStore vectorStore;
+    private final ChatGenService chatGenService;
+    private final ProductMapper productMapper;
     private final MessageSourceService messageSourceService;
+
     private final String PRODUCT_ID = "productId";
 
 
     @Autowired
-    public ProductServiceImpl(ProductRepository productRepository, VectorStore vectorStore, MessageSourceService messageSourceService) {
+    public ProductServiceImpl(ProductRepository productRepository, VectorStore vectorStore, ChatGenService chatGenService, ProductMapper productMapper, MessageSourceService messageSourceService) {
         this.productRepository = productRepository;
         this.vectorStore = vectorStore;
+        this.chatGenService = chatGenService;
+        this.productMapper = productMapper;
         this.messageSourceService = messageSourceService;
     }
 
@@ -61,7 +66,7 @@ public class ProductServiceImpl implements ProductService {
     }
 
     public String getVectorId(Long productId) {
-        // Generates a deterministic UUID based on the bytes of your Long ID
+        // Generates a deterministic UUID based on the bytes of the Long ID
         return UUID.nameUUIDFromBytes(String.valueOf(productId).getBytes()).toString();
     }
 
@@ -82,7 +87,7 @@ public class ProductServiceImpl implements ProductService {
     }
 
     @Override
-    public List<Product> semanticSearch(String query, Integer page) {
+    public List<Product> semanticSearch(String query, Integer page) throws Exception {
         if (Objects.isNull(query) || query.isBlank()) {
             return getAll(page, StoreConstants.PRODUCT_SEARCH_CHUNK_SIZE);
         }
@@ -94,7 +99,11 @@ public class ProductServiceImpl implements ProductService {
         List<Long> productIds = results.stream()
                 .map(doc -> (Integer) doc.getMetadata().get(PRODUCT_ID)).map(Integer::longValue)
                 .collect(Collectors.toList());
-        return productRepository.findAllById(productIds);
+        List<Product> products = productRepository.findAllById(productIds);
+        // Further filter the products by invoking the chat model
+        SearchSummary searchSummary = chatGenService.searchElements(query, productMapper.toAIParseableDtos(products));
+        List<Long> idList = Optional.ofNullable(searchSummary).map(SearchSummary::getHighlightedFeatureIDs).orElse(List.of());
+        return products.stream().filter(p -> idList.contains(p.getId())).collect(Collectors.toList());
     }
 
     @Override

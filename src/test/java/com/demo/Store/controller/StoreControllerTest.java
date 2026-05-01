@@ -15,8 +15,7 @@ import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertSame;
-import static org.mockito.ArgumentMatchers.anyList;
-import static org.mockito.ArgumentMatchers.anyString;
+import static org.mockito.ArgumentMatchers.*;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
@@ -45,28 +44,12 @@ class StoreControllerTest {
     void searchReturnsMappedProductsWhenQueryIsBlank() throws Exception {
         List<Product> products = List.of(new Product());
         List<ProductDto> mappedProducts = List.of(new ProductDto());
-        when(productService.semanticSearch(" ", 0)).thenReturn(products);
+        when(productService.semanticSearch(anyString(), anyInt())).thenReturn(products);
         when(productMapper.toDtos(products)).thenReturn(mappedProducts);
 
-        List<ProductDto> result = controller.search(" ", 0);
+        List<ProductDto> result = controller.search(anyString(), anyInt());
 
         assertSame(mappedProducts, result);
-        verify(chatGenService, never()).filterElements(anyString(), anyList());
-    }
-
-    @Test
-    void searchUsesChatFilterWhenQueryIsNotBlank() throws Exception {
-        List<Product> products = List.of(new Product());
-        List<ProductDto> mappedProducts = List.of(new ProductDto(), new ProductDto());
-        List<ProductDto> filteredProducts = List.of(mappedProducts.getFirst());
-        String query = "laptop";
-        when(productService.semanticSearch(query, 1)).thenReturn(products);
-        when(productMapper.toDtos(products)).thenReturn(mappedProducts);
-        when(chatGenService.filterElements(query, mappedProducts)).thenReturn(filteredProducts);
-
-        List<ProductDto> result = controller.search(query, 1);
-
-        assertSame(filteredProducts, result);
-        verify(chatGenService).filterElements(query, mappedProducts);
+        verify(chatGenService, never()).searchElements(anyString(), anyList());
     }
 }

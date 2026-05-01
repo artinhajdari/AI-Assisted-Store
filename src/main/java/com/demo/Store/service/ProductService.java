@@ -39,7 +39,7 @@ public interface ProductService {
      * @param page page index used by fallback pagination when query is blank
      * @return list of products matching the semantic query
      */
-    List<Product> semanticSearch(String query, Integer page);
+    List<Product> semanticSearch(String query, Integer page) throws Exception;
 
     /**
      * Deletes a product by its identifier.

@@ -2,6 +2,9 @@ package com.demo.Store.service.impl;
 
 import com.demo.Store.model.Product;
 import com.demo.Store.model.dto.OperationResultDto;
+import com.demo.Store.model.dto.ProductDto;
+import com.demo.Store.model.dto.ai.SearchSummary;
+import com.demo.Store.model.dto.mapper.ProductMapper;
 import com.demo.Store.repository.ProductRepository;
 import com.demo.Store.service.MessageSourceService;
 import org.junit.jupiter.api.BeforeEach;
@@ -40,6 +43,12 @@ class ProductServiceImplTest {
 
     @Mock
     private VectorStore vectorStore;
+
+    @Mock
+    private ChatGenServiceImpl chatGenService;
+
+    @Mock
+    private ProductMapper productMapper;
 
     @Mock
     private MessageSourceService messageSourceService;
@@ -126,19 +135,27 @@ class ProductServiceImplTest {
     }
 
     @Test
-    void semanticSearchUsesVectorStoreAndDaoLookup() {
+    void semanticSearchUsesVectorStoreAndChatModelFiltering() throws Exception {
+        String prompt = "phone";
         Long productId = 5L;
         product.setId(productId);
+        List<Product> daoReturnedProducts = List.of(product);
+        ProductDto aiParseableProductDto = new ProductDto();
+        aiParseableProductDto.setId(productId);
+        List<ProductDto> aiParseableProducts = List.of(aiParseableProductDto);
         Document doc = new Document("1", "content", Map.of("productId", 5));
         when(vectorStore.similaritySearch(any(SearchRequest.class))).thenReturn(List.of(doc));
-        when(productRepository.findAllById(List.of(5L))).thenReturn(List.of(product));
+        when(productRepository.findAllById(List.of(5L))).thenReturn(daoReturnedProducts);
+        when(productMapper.toAIParseableDtos(daoReturnedProducts)).thenReturn(aiParseableProducts);
+        when(chatGenService.searchElements(prompt, aiParseableProducts)).thenReturn(SearchSummary.of(aiParseableProducts));
 
-        List<Product> result = service.semanticSearch("phone", 0);
+        List<Product> result = service.semanticSearch(prompt, 0);
 
         assertEquals(1, result.size());
         assertEquals(productId, result.getFirst().getId());
         verify(vectorStore).similaritySearch(any(SearchRequest.class));
         verify(productRepository).findAllById(List.of(productId));
+        verify(chatGenService).searchElements(prompt, aiParseableProducts);
     }
 
     @Test

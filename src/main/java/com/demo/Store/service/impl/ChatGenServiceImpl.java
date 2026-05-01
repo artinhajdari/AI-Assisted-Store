@@ -13,7 +13,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.*;
-import java.util.stream.Collectors;
 
 @Service
 public class ChatGenServiceImpl implements ChatGenService {
@@ -28,9 +27,9 @@ public class ChatGenServiceImpl implements ChatGenService {
     }
 
     @Override
-    public <T extends AISearchable> List<T> filterElements(String userPrompt, List<T> elements) throws Exception {
+    public <T extends AISearchable> SearchSummary searchElements(String userPrompt, List<T> elements) throws Exception {
         if (StringUtils.isBlank(userPrompt) || Objects.isNull(elements) || elements.isEmpty()) {
-            return elements;
+            return SearchSummary.of(elements);
         }
         var converter = new BeanOutputConverter<>(SearchSummary.class);
         String jsonItems = objectMapper.writeValueAsString(elements);
@@ -47,14 +46,6 @@ public class ChatGenServiceImpl implements ChatGenService {
                         "format", converter.getFormat()
                 )));
         String response = chatModel.call(prompt).getResult().getOutput().getText();
-        SearchSummary searchSummary = Optional.ofNullable(response).map(res -> converter.convert(response)).orElse(null);
-        if (Objects.isNull(searchSummary)) {
-            return elements;
-        }
-        List<Long> generatedItemIDs = searchSummary.getHighlightedFeatureIDs();
-        if (Objects.isNull(generatedItemIDs) || generatedItemIDs.isEmpty()) {
-            return Collections.emptyList();
-        }
-        return elements.stream().filter(element -> generatedItemIDs.contains(element.getId())).collect(Collectors.toList());
+        return Optional.ofNullable(response).map(res -> converter.convert(response)).orElse(SearchSummary.empty());
     }
 }
